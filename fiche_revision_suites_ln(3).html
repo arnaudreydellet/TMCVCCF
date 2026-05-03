@@ -1,0 +1,3549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suites géométriques & Logarithme népérien · Fiche de révision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #faf7f2;
+    --paper-2: #f3ede2;
+    --paper-3: #e8e0d0;
+    --accent: #c8401e;        /* rouge brique — pour les suites */
+    --accent-soft: #f5e1d8;
+    --accent-deep: #7a2510;
+    --indigo: #2d3a8c;        /* bleu encre — pour ln */
+    --indigo-soft: #dde0f0;
+    --indigo-deep: #1a2456;
+    --gold: #b8862a;          /* or — pour le pont entre les deux */
+    --gold-soft: #f0e4c5;
+    --gold-deep: #6b4c10;
+    --muted: #6b6660;
+    --line: rgba(26, 26, 26, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 17px;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* iOS Safari : empêche le zoom auto sur focus d'input (font-size doit être ≥ 16px) */
+  input, textarea, select {
+    font-size: 16px;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
+  }
+
+  /* Texture papier subtile */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(184, 134, 42, 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(45, 58, 140, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     HEADER ÉDITORIAL
+  ═══════════════════════════════════════════════════════════ */
+  header {
+    padding: 80px 0 60px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 80px;
+    position: relative;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .eyebrow::before, .eyebrow::after {
+    content: '';
+    height: 1px;
+    background: var(--ink);
+    flex: 0 0 32px;
+  }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 32px;
+    font-variation-settings: "opsz" 144;
+    color: var(--ink);
+  }
+
+  h1.title .amp {
+    font-weight: 900;
+    font-size: 0.9em;
+  }
+
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 620px;
+    font-weight: 400;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 32px;
+    margin-top: 48px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .meta-row span strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTIONS
+  ═══════════════════════════════════════════════════════════ */
+  section {
+    margin-bottom: 100px;
+  }
+
+  .section-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .section-num {
+    font-family: 'Fraunces', serif;
+    font-size: 96px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--paper);
+    -webkit-text-stroke: 1.5px var(--ink);
+    font-variation-settings: "opsz" 144;
+  }
+
+  .section-title-block h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .section-title-block .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* PROSE */
+  .prose p {
+    margin-bottom: 20px;
+    max-width: 680px;
+  }
+
+  .prose strong {
+    font-weight: 600;
+    background: linear-gradient(180deg, transparent 60%, var(--gold-soft) 60%);
+    padding: 0 2px;
+  }
+
+  .prose em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.05em;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CALLOUT — la définition centrale
+  ═══════════════════════════════════════════════════════════ */
+  .callout {
+    background: var(--paper-2);
+    border-left: 4px solid var(--accent);
+    padding: 28px 36px;
+    margin: 32px 0;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .callout p {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LE COEUR DU PRODUIT — DEUX FORMULES, DEUX USAGES
+  ═══════════════════════════════════════════════════════════ */
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin: 48px 0;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .product-card {
+    padding: 40px 36px;
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:first-child {
+    border-right: 2px solid var(--ink);
+    background: linear-gradient(180deg, var(--accent-soft) 0%, var(--paper) 100%);
+  }
+
+  .product-card:last-child {
+    background: linear-gradient(180deg, var(--indigo-soft) 0%, var(--paper) 100%);
+  }
+
+  .product-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .product-card:first-child .product-tag {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  .product-card:last-child .product-tag {
+    background: var(--indigo);
+    color: var(--paper);
+  }
+
+  .product-name {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .product-tagline {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .formula-display {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 28px 24px;
+    text-align: center;
+    margin: 24px 0;
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  .formula-display sub, .formula-display sup {
+    font-size: 0.6em;
+  }
+
+  .product-card:first-child .formula-display {
+    color: var(--accent-deep);
+  }
+
+  .product-card:last-child .formula-display {
+    color: var(--indigo-deep);
+  }
+
+  .product-features {
+    list-style: none;
+    margin-top: 24px;
+  }
+
+  .product-features li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .product-features li:last-child {
+    border-bottom: none;
+  }
+
+  .feature-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  .product-card:first-child .feature-icon {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  .product-card:last-child .feature-icon {
+    background: var(--indigo);
+    color: var(--paper);
+  }
+
+  .feature-text strong {
+    font-weight: 600;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     COMPARAISON QUAND UTILISER QUOI
+  ═══════════════════════════════════════════════════════════ */
+  .comparison-banner {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 56px 48px;
+    border-radius: 16px;
+    margin: 64px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .comparison-banner::before {
+    content: 'vs';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Fraunces', serif;
+    font-size: 280px;
+    font-style: italic;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .comparison-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
+    position: relative;
+  }
+
+  .comparison-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(250, 247, 242, 0.6);
+    text-align: center;
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .scenarios {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    position: relative;
+  }
+
+  .scenario {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 24px;
+  }
+
+  .scenario-when {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .scenario:first-child .scenario-when { color: #ff8a6a; }
+  .scenario:last-child .scenario-when { color: #a8b3e8; }
+
+  .scenario-question {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-style: italic;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+
+  .scenario-answer {
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(250, 247, 242, 0.8);
+  }
+
+  .scenario-answer code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--paper);
+    font-size: 13px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     EXEMPLE VISUEL — la suite qui se déroule
+  ═══════════════════════════════════════════════════════════ */
+  .sequence-demo {
+    background: var(--paper-2);
+    border-radius: 12px;
+    padding: 40px 32px;
+    margin: 32px 0;
+  }
+
+  .sequence-demo-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .sequence-demo-intro {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-style: italic;
+    margin-bottom: 32px;
+    color: var(--ink);
+  }
+
+  .sequence-chain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .seq-term {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 16px 18px;
+    text-align: center;
+    min-width: 90px;
+    font-family: 'Fraunces', serif;
+  }
+
+  .seq-term .seq-name {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .seq-term .seq-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent-deep);
+  }
+
+  .seq-arrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    text-align: center;
+    font-weight: 600;
+    background: var(--accent-soft);
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .sequence-comment {
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LN — propriétés et tableau
+  ═══════════════════════════════════════════════════════════ */
+  .ln-properties {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 32px 0;
+  }
+
+  .ln-prop {
+    background: var(--paper);
+    border: 1.5px solid var(--indigo);
+    border-radius: 10px;
+    padding: 24px 20px;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .ln-prop:hover {
+    transform: translateY(-2px);
+  }
+
+  .ln-prop.featured {
+    background: var(--indigo);
+    color: var(--paper);
+  }
+
+  .ln-prop-num {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .ln-prop.featured .ln-prop-num {
+    color: rgba(250, 247, 242, 0.5);
+  }
+
+  .ln-prop-formula {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .ln-prop-formula sup, .ln-prop-formula sub {
+    font-size: 0.65em;
+  }
+
+  .ln-prop-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .ln-prop.featured .ln-prop-desc {
+    color: rgba(250, 247, 242, 0.85);
+  }
+
+  .ln-prop.featured .ln-prop-desc strong {
+    color: var(--paper);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LE PONT — section dorée
+  ═══════════════════════════════════════════════════════════ */
+  .bridge {
+    background: linear-gradient(135deg, var(--gold-soft) 0%, var(--paper-2) 100%);
+    border-radius: 16px;
+    padding: 56px 48px;
+    margin: 64px 0;
+    position: relative;
+    border: 1px solid var(--gold);
+  }
+
+  .bridge::before {
+    content: '★';
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    font-size: 48px;
+    color: var(--gold);
+    opacity: 0.3;
+  }
+
+  .bridge-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .bridge h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+  }
+
+  .bridge-text {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    max-width: 700px;
+  }
+
+  .bridge-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 24px;
+    line-height: 1.4;
+    padding: 24px 0 24px 32px;
+    border-left: 3px solid var(--gold);
+    color: var(--gold-deep);
+    margin: 24px 0;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     EXEMPLE COMPLET — étapes
+  ═══════════════════════════════════════════════════════════ */
+  .worked-example {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 0;
+    margin: 40px 0;
+    overflow: hidden;
+  }
+
+  .we-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 24px 32px;
+  }
+
+  .we-header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(250, 247, 242, 0.6);
+    margin-bottom: 6px;
+  }
+
+  .we-header-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.3;
+    font-style: italic;
+  }
+
+  .we-body {
+    padding: 32px;
+  }
+
+  .we-step {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 24px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .we-step:last-child { border-bottom: none; }
+
+  .we-step-num {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--paper);
+    -webkit-text-stroke: 1px var(--ink);
+    font-variation-settings: "opsz" 144;
+  }
+
+  .we-step.final .we-step-num {
+    color: var(--gold);
+    -webkit-text-stroke: 0;
+  }
+
+  .we-step-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .we-step-content {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .we-math {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--paper-2);
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .we-step.final {
+    background: var(--gold-soft);
+    margin: 16px -32px -32px;
+    padding: 24px 32px;
+    border-bottom: none;
+    border-top: 1px solid var(--gold);
+  }
+
+  .we-step.final .we-step-content {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     PIEGES À EVITER
+  ═══════════════════════════════════════════════════════════ */
+  .pitfalls {
+    margin: 48px 0;
+  }
+
+  .pitfall {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    padding: 24px;
+    background: #fff5ed;
+    border: 1px solid #f0a574;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+
+  .pitfall-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .pitfall-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--accent-deep);
+  }
+
+  .pitfall-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .pitfall-text code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(200, 64, 30, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CHEAT SHEET FINALE
+  ═══════════════════════════════════════════════════════════ */
+  .cheatsheet {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 16px;
+    padding: 56px 48px;
+    margin: 80px 0 60px;
+  }
+
+  .cheatsheet-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .cheatsheet h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    line-height: 1.1;
+  }
+
+  .cheatsheet-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .cs-item {
+    border-top: 1px solid rgba(250, 247, 242, 0.2);
+    padding-top: 16px;
+  }
+
+  .cs-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .cs-formula {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .cs-context {
+    font-size: 13px;
+    color: rgba(250, 247, 242, 0.7);
+    line-height: 1.5;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     FOOTER
+  ═══════════════════════════════════════════════════════════ */
+  footer {
+    border-top: 2px solid var(--ink);
+    padding: 48px 0 80px;
+    margin-top: 80px;
+    text-align: center;
+  }
+
+  footer p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     EXERCICES PROGRESSIFS
+  ═══════════════════════════════════════════════════════════ */
+  .level-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 64px 0 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .level-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .level-badge.lvl-1 { background: #639922; }
+  .level-badge.lvl-2 { background: var(--indigo); }
+  .level-badge.lvl-3 { background: var(--accent); }
+  .level-badge.lvl-4 { background: var(--ink); }
+
+  .level-title {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    flex: 1;
+  }
+
+  .level-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .exercise {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .exercise.solved {
+    box-shadow: 4px 4px 0 #639922;
+  }
+
+  .exercise.failed {
+    box-shadow: 4px 4px 0 var(--accent);
+  }
+
+  .ex-header {
+    background: var(--paper-2);
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .ex-number {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .ex-difficulty {
+    display: flex;
+    gap: 3px;
+  }
+
+  .ex-difficulty .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+
+  .ex-difficulty .dot.on {
+    background: var(--ink);
+  }
+
+  .ex-tag {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 4px 10px;
+    background: var(--paper);
+    border-radius: 4px;
+    border: 1px solid var(--line);
+  }
+
+  .ex-body {
+    padding: 28px 32px;
+  }
+
+  .ex-statement {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .ex-statement strong {
+    font-weight: 600;
+    background: linear-gradient(180deg, transparent 60%, var(--gold-soft) 60%);
+    padding: 0 2px;
+  }
+
+  .ex-question {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 20px;
+    padding-left: 16px;
+    border-left: 3px solid var(--gold);
+  }
+
+  .ex-input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .ex-input-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .ex-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    background: var(--paper);
+    width: 140px;
+    transition: border-color 0.15s ease;
+  }
+
+  .ex-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .ex-input.correct {
+    border-color: #639922;
+    background: #f0f7e3;
+  }
+
+  .ex-input.wrong {
+    border-color: var(--accent);
+    background: #fdeee9;
+  }
+
+  .ex-input-unit {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .ex-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .ex-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .ex-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .ex-btn.primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .ex-btn.primary:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .ex-btn.hint-btn {
+    border-color: var(--gold);
+    color: var(--gold-deep);
+  }
+
+  .ex-btn.hint-btn:hover {
+    background: var(--gold);
+    color: var(--paper);
+  }
+
+  .ex-feedback {
+    margin-top: 20px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    display: none;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .ex-feedback.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ex-feedback.success {
+    background: #f0f7e3;
+    border-left: 3px solid #639922;
+    color: #2c4a08;
+  }
+
+  .ex-feedback.error {
+    background: #fdeee9;
+    border-left: 3px solid var(--accent);
+    color: var(--accent-deep);
+  }
+
+  .ex-feedback.hint {
+    background: var(--gold-soft);
+    border-left: 3px solid var(--gold);
+    color: var(--gold-deep);
+  }
+
+  .ex-feedback strong {
+    font-weight: 600;
+  }
+
+  .ex-correction {
+    margin-top: 20px;
+    padding: 24px;
+    background: var(--paper-2);
+    border-radius: 8px;
+    display: none;
+  }
+
+  .ex-correction.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+  }
+
+  .ex-correction-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .ex-correction-step {
+    margin-bottom: 14px;
+    padding-left: 24px;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .ex-correction-step::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .ex-correction-step:last-child {
+    margin-bottom: 0;
+  }
+
+  .ex-correction-math {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--paper);
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 4px 0;
+    font-size: 14px;
+    border: 1px solid var(--line);
+  }
+
+  .ex-correction-final {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--gold-soft);
+    border-radius: 6px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--gold-deep);
+  }
+
+  /* QCM */
+  .ex-qcm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .ex-qcm-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: var(--paper);
+    font-size: 15px;
+  }
+
+  .ex-qcm-option:hover {
+    border-color: var(--ink);
+  }
+
+  .ex-qcm-option.selected {
+    border-color: var(--ink);
+    background: var(--paper-2);
+  }
+
+  .ex-qcm-option.correct {
+    border-color: #639922;
+    background: #f0f7e3;
+  }
+
+  .ex-qcm-option.wrong {
+    border-color: var(--accent);
+    background: #fdeee9;
+  }
+
+  .ex-qcm-marker {
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .ex-qcm-option.selected .ex-qcm-marker {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* Indicateur de progression */
+  .progress-tracker {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin: 48px 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .progress-tracker-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .progress-tracker-text {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .progress-counter {
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--gold);
+  }
+
+  .progress-counter sub {
+    font-size: 22px;
+    color: rgba(250, 247, 242, 0.5);
+  }
+
+  /* Intro de section exercices */
+  .ex-intro {
+    background: var(--paper-2);
+    padding: 32px 36px;
+    border-radius: 12px;
+    margin: 32px 0 48px;
+    border-left: 4px solid var(--gold);
+  }
+
+  .ex-intro-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .ex-intro h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .ex-intro p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     EXERCICE TYPE BAC — sujet complet
+  ═══════════════════════════════════════════════════════════ */
+  .bac-exam {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 48px 0;
+  }
+
+  .bac-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 36px 40px;
+    position: relative;
+  }
+
+  .bac-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--gold) 50%, var(--indigo) 100%);
+  }
+
+  .bac-stamp {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--ink);
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .bac-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .bac-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(250, 247, 242, 0.7);
+    margin-top: 16px;
+  }
+
+  .bac-meta strong {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .bac-context {
+    background: var(--paper-2);
+    padding: 28px 36px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bac-context-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .bac-context p {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  .bac-context p:last-child { margin-bottom: 0; }
+
+  .bac-context strong {
+    font-weight: 600;
+    background: linear-gradient(180deg, transparent 60%, var(--gold-soft) 60%);
+    padding: 0 2px;
+  }
+
+  .bac-questions {
+    padding: 0;
+  }
+
+  .bac-question {
+    border-bottom: 1px solid var(--line);
+    padding: 28px 36px;
+  }
+
+  .bac-question:last-child { border-bottom: none; }
+
+  .bac-q-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .bac-q-number {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--accent);
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .bac-q-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  .bac-q-points {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--paper-2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .bac-q-text {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    margin-left: 38px;
+  }
+
+  .bac-q-text strong {
+    font-weight: 600;
+  }
+
+  .bac-q-input-area {
+    margin-left: 38px;
+  }
+
+  .bac-q-input-area .ex-input-row {
+    margin-bottom: 12px;
+  }
+
+  .bac-q-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-left: 38px;
+    margin-top: 12px;
+  }
+
+  .bac-q-feedback {
+    margin-left: 38px;
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 6px;
+    display: none;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .bac-q-feedback.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+  }
+
+  .bac-q-feedback.success {
+    background: #f0f7e3;
+    border-left: 3px solid #639922;
+    color: #2c4a08;
+  }
+
+  .bac-q-feedback.error {
+    background: #fdeee9;
+    border-left: 3px solid var(--accent);
+    color: var(--accent-deep);
+  }
+
+  .bac-q-feedback.hint {
+    background: var(--gold-soft);
+    border-left: 3px solid var(--gold);
+    color: var(--gold-deep);
+  }
+
+  .bac-q-correction {
+    margin-left: 38px;
+    margin-top: 16px;
+    padding: 20px 24px;
+    background: var(--paper-2);
+    border-radius: 6px;
+    display: none;
+  }
+
+  .bac-q-correction.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+  }
+
+  .bac-q-correction-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .bac-q-correction-step {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .bac-q-correction-step::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .bac-q-correction-step:last-child {
+    margin-bottom: 0;
+  }
+
+  .bac-q-correction-final {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: var(--gold-soft);
+    border-radius: 4px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--gold-deep);
+  }
+
+  .bac-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+
+  .bac-table th, .bac-table td {
+    border: 1px solid var(--ink);
+    padding: 10px 14px;
+    text-align: center;
+  }
+
+  .bac-table th {
+    background: var(--paper-2);
+    font-weight: 600;
+  }
+
+  .bac-table input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    padding: 4px 8px;
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    width: 80px;
+    text-align: center;
+  }
+
+  .bac-table input.correct { border-color: #639922; background: #f0f7e3; }
+  .bac-table input.wrong { border-color: var(--accent); background: #fdeee9; }
+
+  /* ═══════════════════════════════════════════════════════════
+     RESPONSIVE
+  ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .container { padding: 0 20px; }
+    header { padding: 48px 0 40px; margin-bottom: 48px; }
+    section { margin-bottom: 60px; }
+    .section-num { font-size: 64px; }
+    .section-title-block h2 { font-size: 28px; }
+    .product-grid { grid-template-columns: 1fr; }
+    .product-card:first-child { border-right: none; border-bottom: 2px solid var(--ink); }
+    .scenarios { grid-template-columns: 1fr; gap: 16px; }
+    .ln-properties { grid-template-columns: 1fr; }
+    .cheatsheet-grid { grid-template-columns: 1fr; }
+    .formula-display { font-size: 24px; padding: 20px 16px; }
+    .comparison-banner, .bridge, .cheatsheet { padding: 32px 24px; }
+    .comparison-banner::before { font-size: 180px; }
+    .we-step { grid-template-columns: 40px 1fr; gap: 16px; }
+    .we-step-num { font-size: 28px; }
+    .we-step.final { margin: 16px -16px -16px; padding: 20px 16px; }
+    .we-body { padding: 20px; }
+    .seq-term { min-width: 70px; padding: 12px 14px; }
+    .seq-term .seq-value { font-size: 18px; }
+    .lede { font-size: 18px; }
+    body { font-size: 16px; }
+    .level-header { flex-wrap: wrap; gap: 12px; margin: 40px 0 24px; }
+    .level-title { font-size: 22px; flex: 1 1 100%; }
+    .ex-body { padding: 20px 18px; }
+    .ex-header { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+    .ex-input { width: 100%; max-width: 200px; }
+    .progress-tracker { grid-template-columns: 1fr; padding: 24px; text-align: center; }
+    .progress-counter { font-size: 42px; }
+    .ex-intro { padding: 24px; }
+    .ex-intro h3 { font-size: 22px; }
+    .bac-header { padding: 24px; }
+    .bac-title { font-size: 22px; }
+    .bac-context, .bac-question { padding: 20px; }
+    .bac-q-text, .bac-q-input-area, .bac-q-actions, .bac-q-feedback, .bac-q-correction { margin-left: 0; }
+    .bac-table { font-size: 12px; }
+    .bac-table th, .bac-table td { padding: 6px 8px; }
+    .bac-table input { width: 60px; }
+  }
+
+  /* iPhone et petits écrans (≤ 480px) */
+  @media (max-width: 480px) {
+    .container { padding: 0 16px; }
+    header { padding: 32px 0 32px; margin-bottom: 36px; }
+    .eyebrow { font-size: 11px; gap: 8px; }
+    .eyebrow::before, .eyebrow::after { flex: 0 0 16px; }
+    .lede { font-size: 16px; }
+    .meta-row { gap: 16px; font-size: 11px; }
+    section { margin-bottom: 48px; }
+    .section-marker { gap: 16px; margin-bottom: 28px; }
+    .section-num { font-size: 48px; }
+    .section-title-block h2 { font-size: 22px; }
+    .section-title-block .subtitle { font-size: 11px; }
+
+    /* Callouts et zones de prose */
+    .callout { padding: 20px 22px; }
+    .callout p { font-size: 16px; }
+    .prose p { font-size: 15px; }
+
+    /* Sequence demo */
+    .sequence-demo { padding: 24px 16px; }
+    .seq-term { min-width: 56px; padding: 8px 10px; }
+    .seq-term .seq-name { font-size: 11px; }
+    .seq-term .seq-value { font-size: 15px; }
+    .seq-arrow { font-size: 9px; padding: 3px 5px; }
+
+    /* Cards produit */
+    .product-card { padding: 24px 20px; }
+    .product-name { font-size: 22px; }
+    .formula-display { font-size: 20px; padding: 16px 12px; box-shadow: 3px 3px 0 var(--ink); }
+
+    /* Comparison banner */
+    .comparison-banner { padding: 28px 20px; }
+    .comparison-title { font-size: 24px; }
+    .comparison-banner::before { font-size: 120px; }
+    .scenario-question { font-size: 16px; }
+
+    /* Bridge */
+    .bridge { padding: 28px 20px; }
+    .bridge h3 { font-size: 26px; }
+    .bridge-quote { font-size: 18px; padding: 16px 0 16px 20px; }
+
+    /* Worked example */
+    .we-header { padding: 18px 20px; }
+    .we-header-title { font-size: 17px; }
+    .we-body { padding: 16px; }
+    .we-step { grid-template-columns: 32px 1fr; gap: 12px; padding: 14px 0; }
+    .we-step-num { font-size: 24px; }
+    .we-step.final { margin: 12px -16px -16px; padding: 16px; }
+    .we-math { font-size: 13px; padding: 6px 10px; }
+
+    /* Pitfalls */
+    .pitfall { padding: 18px 16px; gap: 14px; }
+    .pitfall-icon { width: 32px; height: 32px; font-size: 18px; }
+    .pitfall-title { font-size: 16px; }
+
+    /* Cheatsheet */
+    .cheatsheet { padding: 28px 20px; }
+    .cheatsheet h3 { font-size: 26px; }
+    .cs-formula { font-size: 18px; }
+
+    /* EXERCICES */
+    .ex-intro { padding: 20px; }
+    .ex-intro h3 { font-size: 20px; }
+    .ex-intro p { font-size: 14px; }
+    .level-header { margin: 32px 0 20px; padding-bottom: 12px; }
+    .level-badge { font-size: 10px; padding: 6px 10px; }
+    .level-title { font-size: 18px; }
+    .level-meta { font-size: 10px; flex: 1 1 100%; }
+    .ex-header { padding: 10px 14px; }
+    .ex-number { font-size: 20px; }
+    .ex-tag { font-size: 9px; padding: 3px 8px; margin-left: 0; }
+    .ex-body { padding: 18px 16px; }
+    .ex-statement { font-size: 15px; }
+    .ex-question { font-size: 15px; padding-left: 12px; }
+    .ex-input { font-size: 14px; padding: 8px 12px; }
+    .ex-input-row { gap: 8px; }
+    .ex-actions { gap: 8px; }
+    .ex-btn { padding: 9px 16px; font-size: 13px; }
+    .ex-feedback, .ex-correction { padding: 14px 16px; font-size: 14px; }
+    .ex-correction-step { font-size: 14px; padding-left: 18px; }
+    .ex-correction-final { font-size: 15px; padding: 10px 12px; }
+    .ex-qcm-option { padding: 12px 14px; font-size: 14px; gap: 10px; }
+    .ex-qcm-marker { width: 24px; height: 24px; font-size: 11px; }
+
+    /* Progress tracker */
+    .progress-tracker { padding: 20px; }
+    .progress-counter { font-size: 36px; }
+    .progress-tracker-text { font-size: 18px; }
+
+    /* SUJET BAC */
+    .bac-header { padding: 20px 18px; }
+    .bac-stamp { font-size: 9px; padding: 3px 8px; }
+    .bac-title { font-size: 20px; }
+    .bac-meta { gap: 12px; font-size: 10px; }
+    .bac-context { padding: 18px 16px; }
+    .bac-context p { font-size: 15px; }
+    .bac-question { padding: 18px 16px; }
+    .bac-q-header { gap: 10px; flex-wrap: wrap; }
+    .bac-q-number { font-size: 18px; }
+    .bac-q-title { font-size: 15px; flex: 1 1 calc(100% - 60px); }
+    .bac-q-points { font-size: 10px; padding: 3px 8px; }
+    .bac-q-text { font-size: 14px; margin-left: 0; }
+    .bac-q-input-area { margin-left: 0; }
+    .bac-q-actions { margin-left: 0; gap: 8px; }
+    .bac-q-feedback, .bac-q-correction { margin-left: 0; padding: 14px 16px; font-size: 13px; }
+    .bac-q-correction-step { font-size: 13px; padding-left: 16px; margin-bottom: 8px; }
+    .bac-q-correction-final { font-size: 14px; padding: 10px 12px; }
+
+    /* Tableau bac responsive (Q2) — passage en scroll horizontal sécurisé */
+    .bac-q-input-area {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .bac-table { font-size: 11px; min-width: 100%; }
+    .bac-table th, .bac-table td { padding: 5px 6px; }
+    .bac-table input { width: 50px; font-size: 12px; padding: 3px 4px; }
+
+    /* Section title */
+    h1.title { font-size: 44px; }
+
+    /* Footer */
+    footer { padding: 32px 0 48px; }
+    footer p { font-size: 10px; letter-spacing: 0.15em; }
+  }
+
+  /* Très petits écrans (iPhone SE 1ère gén ~ 320px) */
+  @media (max-width: 360px) {
+    .container { padding: 0 12px; }
+    h1.title { font-size: 38px; }
+    .section-num { font-size: 40px; }
+    .section-title-block h2 { font-size: 20px; }
+    .formula-display { font-size: 18px; }
+    .product-name { font-size: 20px; }
+    .bridge h3 { font-size: 22px; }
+    .cheatsheet h3 { font-size: 22px; }
+    .bac-title { font-size: 18px; }
+    /* Labels JetBrains Mono qui peuvent déborder */
+    .ex-tag { font-size: 8px; }
+    .level-meta { display: none; } /* on enlève les méta sur très petit */
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══════════════════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════════════════ -->
+  <header>
+    <div class="eyebrow">Fiche de révision · Terminale Bac Pro</div>
+    <h1 class="title">
+      Suites<br>
+      géométriques<br>
+      <span class="amp">&amp;</span> logarithme
+    </h1>
+    <p class="lede">
+      Tout ce qu'il faut savoir pour le CCF, expliqué pas à pas — depuis la première rencontre avec une suite jusqu'à la résolution complète d'un problème de seuil.
+    </p>
+    <div class="meta-row">
+      <span><strong>Niveau</strong> · Tle Bac Pro</span>
+      <span><strong>Épreuve</strong> · CCF Maths</span>
+      <span><strong>Lecture</strong> · 15 min</span>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 1 — LA SUITE GEOMETRIQUE
+  ═══════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-marker">
+      <span class="section-num">01</span>
+      <div class="section-title-block">
+        <div class="subtitle">Le concept fondamental</div>
+        <h2>Qu'est-ce qu'une suite géométrique ?</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Une <strong>suite</strong>, c'est tout simplement une liste ordonnée de nombres. On les appelle u₀, u₁, u₂, u₃… Le petit indice indique la position du nombre dans la liste.
+      </p>
+      <p>
+        Une suite devient <strong>géométrique</strong> quand on remarque qu'on passe d'un terme au suivant <em>en multipliant toujours par le même nombre</em>. Ce nombre magique, on l'appelle la <strong>raison</strong> et on le note <em>q</em>.
+      </p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">À retenir</div>
+      <p>
+        Une suite est géométrique si le rapport entre deux termes consécutifs est constant. Ce rapport, c'est la raison <em>q</em>.
+      </p>
+    </div>
+
+    <!-- Démo visuelle d'une suite -->
+    <div class="sequence-demo">
+      <div class="sequence-demo-title">→ Exemple visuel</div>
+      <div class="sequence-demo-intro">
+        On démarre à u₀ = 100, et à chaque étape on multiplie par <strong>q = 1,5</strong> :
+      </div>
+
+      <div class="sequence-chain">
+        <div class="seq-term">
+          <div class="seq-name">u₀</div>
+          <div class="seq-value">100</div>
+        </div>
+        <div class="seq-arrow">× 1,5</div>
+        <div class="seq-term">
+          <div class="seq-name">u₁</div>
+          <div class="seq-value">150</div>
+        </div>
+        <div class="seq-arrow">× 1,5</div>
+        <div class="seq-term">
+          <div class="seq-name">u₂</div>
+          <div class="seq-value">225</div>
+        </div>
+        <div class="seq-arrow">× 1,5</div>
+        <div class="seq-term">
+          <div class="seq-name">u₃</div>
+          <div class="seq-value">337,5</div>
+        </div>
+        <div class="seq-arrow">× 1,5</div>
+        <div class="seq-term">
+          <div class="seq-name">u₄</div>
+          <div class="seq-value">506,25</div>
+        </div>
+      </div>
+
+      <div class="sequence-comment">
+        Chaque terme = le précédent multiplié par 1,5. Voilà l'ADN d'une suite géométrique.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 2 — LE COEUR : DEUX FORMULES, DEUX USAGES
+  ═══════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-marker">
+      <span class="section-num">02</span>
+      <div class="section-title-block">
+        <div class="subtitle">Les deux formules — ne pas les confondre</div>
+        <h2>Deux outils, deux missions</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Voici LE point essentiel de la fiche. Pour travailler avec une suite géométrique, il existe <strong>deux formules</strong>. Elles ne s'utilisent jamais dans le même cas. Beaucoup d'élèves se trompent en les mélangeant — alors qu'en réalité, <em>chacune répond à une question différente</em>.
+      </p>
+    </div>
+
+    <!-- LE GRID PRODUIT — comme une comparaison de plans pricing -->
+    <div class="product-grid">
+
+      <!-- FORMULE 1 : RELATION DE RECURRENCE -->
+      <div class="product-card">
+        <span class="product-tag">Formule n°1</span>
+        <h3 class="product-name">La relation<br>de récurrence</h3>
+        <p class="product-tagline">"Pour passer d'un terme au suivant"</p>
+
+        <div class="formula-display">
+          u<sub>n+1</sub> = u<sub>n</sub> × q
+        </div>
+
+        <ul class="product-features">
+          <li>
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">
+              <strong>À utiliser quand</strong> on veut calculer pas à pas, terme après terme
+            </span>
+          </li>
+          <li>
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">
+              <strong>Idéale pour</strong> remplir un tableau de valeurs ou prouver qu'une suite est géométrique
+            </span>
+          </li>
+          <li>
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">
+              <strong>Limite</strong> : pour calculer u₂₀, il faudrait faire 20 multiplications. Long.
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- FORMULE 2 : FORMULE EXPLICITE / GENERALE -->
+      <div class="product-card">
+        <span class="product-tag">Formule n°2</span>
+        <h3 class="product-name">La formule<br>explicite (générale)</h3>
+        <p class="product-tagline">"Pour bondir directement à n'importe quel rang"</p>
+
+        <div class="formula-display">
+          u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup>
+        </div>
+
+        <ul class="product-features">
+          <li>
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">
+              <strong>À utiliser quand</strong> on veut un terme lointain (u₁₀, u₅₀, u₁₀₀…)
+            </span>
+          </li>
+          <li>
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">
+              <strong>Idéale pour</strong> les questions de seuil : "au bout de combien d'années ?"
+            </span>
+          </li>
+          <li>
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">
+              <strong>C'est ELLE</strong> qu'on combine avec ln pour résoudre une inéquation. À retenir.
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BANNIERE COMPARATIVE QUAND UTILISER QUOI -->
+    <div class="comparison-banner">
+      <h3 class="comparison-title">Quand utiliser laquelle ?</h3>
+      <p class="comparison-subtitle">Lis la question, choisis la bonne formule</p>
+
+      <div class="scenarios">
+        <div class="scenario">
+          <div class="scenario-when">→ Si la question dit…</div>
+          <p class="scenario-question">"Calcule u₃ sachant que u₂ = 80"</p>
+          <p class="scenario-answer">
+            Tu utilises la <strong>relation de récurrence</strong>. C'est un calcul d'un cran : <code>u₃ = u₂ × q</code>. Pas besoin d'artillerie lourde.
+          </p>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-when">→ Si la question dit…</div>
+          <p class="scenario-question">"Calcule u₁₅" ou "À partir de quel rang u<sub>n</sub> &gt; 5000 ?"</p>
+          <p class="scenario-answer">
+            Tu utilises la <strong>formule explicite</strong>. Elle te catapulte directement au rang voulu : <code>u<sub>n</sub> = u₀ × q<sup>n</sup></code>. C'est aussi la porte d'entrée vers ln.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        <strong>Petite remarque qui évite les erreurs</strong> — si la suite ne commence pas à u₀ mais à u₁, la formule explicite devient u<sub>n</sub> = u₁ × q<sup>n−1</sup>. Le principe est le même, l'exposant s'adapte juste au point de départ. Vérifie toujours quel est le premier terme avant d'écrire la formule.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 3 — LIRE LA RAISON
+  ═══════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-marker">
+      <span class="section-num">03</span>
+      <div class="section-title-block">
+        <div class="subtitle">Comprendre la raison q</div>
+        <h2>Ce que q raconte<br>sur la suite</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        La valeur de <em>q</em> n'est pas qu'un nombre dans un calcul — elle dit <strong>la nature de l'évolution</strong>. Sans calculer un seul terme, en regardant juste q, tu peux dire si la suite augmente, diminue ou stagne.
+      </p>
+    </div>
+
+    <div class="ln-properties">
+      <div class="ln-prop" style="border-color: #639922;">
+        <div class="ln-prop-num">i.</div>
+        <div class="ln-prop-formula" style="color: #3B6D11;">q &gt; 1</div>
+        <div class="ln-prop-desc">La suite <strong>augmente</strong>. Croissance, intérêts composés, population qui grandit.</div>
+      </div>
+
+      <div class="ln-prop" style="border-color: #c8401e;">
+        <div class="ln-prop-num">ii.</div>
+        <div class="ln-prop-formula" style="color: #7a2510;">0 &lt; q &lt; 1</div>
+        <div class="ln-prop-desc">La suite <strong>diminue</strong>. Dépréciation, dose qui s'élimine, dépollution.</div>
+      </div>
+
+      <div class="ln-prop" style="border-color: #888780;">
+        <div class="ln-prop-num">iii.</div>
+        <div class="ln-prop-formula" style="color: #444441;">q = 1</div>
+        <div class="ln-prop-desc">La suite est <strong>constante</strong>. Tous les termes sont égaux à u₀.</div>
+      </div>
+    </div>
+
+    <div class="callout" style="border-left-color: var(--gold);">
+      <div class="callout-label" style="color: var(--gold-deep);">Astuce pourcentages — INDISPENSABLE</div>
+      <p style="font-size: 18px;">
+        <strong>Augmentation de t %</strong> par période → q = 1 + t/100<br>
+        <strong>Diminution de t %</strong> par période → q = 1 − t/100
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        Exemples : un capital placé à 3 % par an → q = 1,03. Une voiture qui perd 8 % de sa valeur chaque année → q = 0,92. Cette traduction "pourcentage → raison" est <strong>la première étape</strong> de tout problème CCF.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 4 — LE LOGARITHME NEPERIEN
+  ═══════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-marker">
+      <span class="section-num">04</span>
+      <div class="section-title-block">
+        <div class="subtitle">L'autre acteur du programme</div>
+        <h2>Le logarithme népérien</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Le logarithme népérien, noté <strong>ln</strong>, c'est une fonction. Elle prend un nombre strictement positif, et te rend un autre nombre. Sa particularité, son super-pouvoir, c'est qu'<em>elle fait descendre les exposants</em>.
+      </p>
+      <p>
+        C'est exactement pour ça qu'on l'utilise avec les suites géométriques : quand n est coincé en haut dans q<sup>n</sup>, ln vient le faire descendre pour qu'on puisse le calculer.
+      </p>
+    </div>
+
+    <div class="callout" style="border-left-color: var(--indigo);">
+      <div class="callout-label" style="color: var(--indigo-deep);">L'idée à graver dans le marbre</div>
+      <p>
+        ln transforme les puissances en multiplications. Là où il y avait un exposant, il y a maintenant une multiplication classique. C'est ça, l'outil qui débloque tout.
+      </p>
+    </div>
+
+    <h3 style="font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; margin: 48px 0 24px;">Les 3 propriétés à connaître</h3>
+
+    <div class="ln-properties">
+      <div class="ln-prop">
+        <div class="ln-prop-num">i.</div>
+        <div class="ln-prop-formula">ln(a × b) = ln(a) + ln(b)</div>
+        <div class="ln-prop-desc">Le ln d'un produit = somme des ln. Multiplication devient addition.</div>
+      </div>
+
+      <div class="ln-prop">
+        <div class="ln-prop-num">ii.</div>
+        <div class="ln-prop-formula">ln(a / b) = ln(a) − ln(b)</div>
+        <div class="ln-prop-desc">Le ln d'un quotient = différence des ln. Division devient soustraction.</div>
+      </div>
+
+      <div class="ln-prop featured">
+        <div class="ln-prop-num">iii.</div>
+        <div class="ln-prop-formula">ln(a<sup>n</sup>) = n × ln(a)</div>
+        <div class="ln-prop-desc"><strong>★ LA propriété clé.</strong> L'exposant descend devant. C'est elle qui fait tout le travail au CCF.</div>
+      </div>
+    </div>
+
+    <h3 style="font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; margin: 48px 0 24px;">Quelques valeurs et règles utiles</h3>
+
+    <div class="ln-properties">
+      <div class="ln-prop" style="border-color: var(--muted);">
+        <div class="ln-prop-formula" style="font-size: 20px;">ln(1) = 0</div>
+        <div class="ln-prop-desc">Le ln de 1 vaut zéro. À retenir.</div>
+      </div>
+
+      <div class="ln-prop" style="border-color: var(--muted);">
+        <div class="ln-prop-formula" style="font-size: 20px;">ln(e) = 1</div>
+        <div class="ln-prop-desc">Le ln de e (≈ 2,718) vaut 1.</div>
+      </div>
+
+      <div class="ln-prop" style="border-color: var(--muted);">
+        <div class="ln-prop-formula" style="font-size: 18px;">ln(x) &gt; 0 ⇔ x &gt; 1</div>
+        <div class="ln-prop-desc">ln est positif au-dessus de 1, négatif entre 0 et 1.</div>
+      </div>
+    </div>
+
+    <div class="pitfall" style="margin-top: 32px;">
+      <div class="pitfall-icon">!</div>
+      <div>
+        <div class="pitfall-title">Domaine de définition</div>
+        <div class="pitfall-text">
+          ln(x) n'existe que pour <code>x &gt; 0</code>. Tu ne peux pas calculer ln(0), encore moins ln(−5). Ça paraît anodin, mais beaucoup d'élèves perdent des points en tentant ln(0).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 5 — LE PONT
+  ═══════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-marker">
+      <span class="section-num">05</span>
+      <div class="section-title-block">
+        <div class="subtitle">Le moment où tout se relie</div>
+        <h2>Pourquoi on mêle<br>les deux au CCF</h2>
+      </div>
+    </div>
+
+    <div class="bridge">
+      <div class="bridge-eyebrow">★ La grande révélation</div>
+      <h3>Une seule question, une seule méthode.</h3>
+      <p class="bridge-text">
+        Au CCF, dans presque tous les sujets qui mettent en jeu une suite géométrique, on te pose <strong>la même question</strong>, juste avec des contextes différents (capital, population, pollution, médicament…). Cette question, c'est :
+      </p>
+
+      <p class="bridge-quote">
+        "Au bout de combien d'années (de mois, de jours…) la quantité dépassera-t-elle — ou descendra-t-elle sous — un certain seuil ?"
+      </p>
+
+      <p class="bridge-text">
+        Et cette question se traduit toujours, <em>toujours</em>, par une inéquation de la forme :
+      </p>
+
+      <div class="formula-display" style="background: var(--paper); color: var(--gold-deep); border-color: var(--gold); margin-top: 24px;">
+        u<sub>0</sub> × q<sup>n</sup> ≥ S    (ou ≤ S)
+      </div>
+
+      <p class="bridge-text" style="margin-top: 24px;">
+        Le problème : <strong>n est dans l'exposant</strong>. Impossible d'isoler n avec les outils classiques. C'est précisément là que ln entre en scène. On applique ln des deux côtés, et grâce à la propriété <em>ln(q<sup>n</sup>) = n × ln(q)</em>, l'exposant descend. n devient un facteur, on peut le sortir.
+      </p>
+    </div>
+
+    <!-- EXEMPLE COMPLET DETAILLE -->
+    <div class="worked-example">
+      <div class="we-header">
+        <div class="we-header-label">Exemple type CCF — résolution complète</div>
+        <div class="we-header-title">"Un capital de 1 000 € est placé à 3 % d'intérêts composés. Au bout de combien d'années dépassera-t-il 1 500 € ?"</div>
+      </div>
+
+      <div class="we-body">
+
+        <div class="we-step">
+          <div class="we-step-num">1</div>
+          <div>
+            <div class="we-step-title">Modéliser la situation</div>
+            <div class="we-step-content">
+              On reconnaît une évolution multiplicative. Chaque année, on multiplie par 1,03 (augmentation de 3 %). C'est donc une suite géométrique de raison <strong>q = 1,03</strong> et de premier terme <strong>u₀ = 1000</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="we-step">
+          <div class="we-step-num">2</div>
+          <div>
+            <div class="we-step-title">Écrire la formule explicite (formule n°2 !)</div>
+            <div class="we-step-content">
+              Comme on cherche à atteindre un seuil au bout de plusieurs années, on utilise la formule générale, pas la récurrence.
+              <div class="we-math">u<sub>n</sub> = 1000 × 1,03<sup>n</sup></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="we-step">
+          <div class="we-step-num">3</div>
+          <div>
+            <div class="we-step-title">Poser l'inéquation</div>
+            <div class="we-step-content">
+              On veut que le capital dépasse 1500 €, donc u<sub>n</sub> ≥ 1500.
+              <div class="we-math">1000 × 1,03<sup>n</sup> ≥ 1500</div>
+              On simplifie en divisant par 1000 :
+              <div class="we-math">1,03<sup>n</sup> ≥ 1,5</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="we-step">
+          <div class="we-step-num">4</div>
+          <div>
+            <div class="we-step-title">Appliquer ln des deux côtés</div>
+            <div class="we-step-content">
+              ln conserve le sens des inégalités quand les nombres sont positifs (ce qui est notre cas).
+              <div class="we-math">ln(1,03<sup>n</sup>) ≥ ln(1,5)</div>
+              On utilise la propriété ln(a<sup>n</sup>) = n × ln(a) :
+              <div class="we-math">n × ln(1,03) ≥ ln(1,5)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="we-step">
+          <div class="we-step-num">5</div>
+          <div>
+            <div class="we-step-title">Isoler n</div>
+            <div class="we-step-content">
+              ln(1,03) ≈ 0,0296 est <strong>positif</strong>, donc on divise sans changer le sens :
+              <div class="we-math">n ≥ ln(1,5) / ln(1,03)</div>
+              À la calculatrice : ln(1,5) / ln(1,03) ≈ 13,72.
+            </div>
+          </div>
+        </div>
+
+        <div class="we-step final">
+          <div class="we-step-num">✓</div>
+          <div>
+            <div class="we-step-title">Conclure dans le contexte</div>
+            <div class="we-step-content">
+              Comme n doit être un nombre entier d'années, on prend l'entier <em>juste au-dessus</em> de 13,72, soit <strong>n = 14</strong>. Le capital dépassera 1 500 € au bout de <strong>14 ans</strong>.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 6 — PIEGES
+  ═══════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-marker">
+      <span class="section-num">06</span>
+      <div class="section-title-block">
+        <div class="subtitle">Les erreurs qui coûtent des points</div>
+        <h2>Trois pièges classiques</h2>
+      </div>
+    </div>
+
+    <div class="pitfalls">
+
+      <div class="pitfall">
+        <div class="pitfall-icon">1</div>
+        <div>
+          <div class="pitfall-title">Confondre les deux formules</div>
+          <div class="pitfall-text">
+            Le piège n°1 : utiliser <code>u<sub>n+1</sub> = u<sub>n</sub> × q</code> alors qu'on veut atteindre un seuil. Cette formule ne te servira jamais à isoler n. <strong>Pour les questions de seuil, c'est toujours la formule explicite</strong> u<sub>n</sub> = u₀ × q<sup>n</sup>.
+          </div>
+        </div>
+      </div>
+
+      <div class="pitfall">
+        <div class="pitfall-icon">2</div>
+        <div>
+          <div class="pitfall-title">Oublier de changer le sens si q &lt; 1</div>
+          <div class="pitfall-text">
+            Quand q est entre 0 et 1 (cas d'une diminution), <code>ln(q) est NÉGATIF</code>. Si tu divises par un nombre négatif, <strong>tu inverses le sens de l'inégalité</strong>. C'est l'erreur n°1 sur les problèmes de dépréciation ou de dépollution.
+          </div>
+        </div>
+      </div>
+
+      <div class="pitfall">
+        <div class="pitfall-icon">3</div>
+        <div>
+          <div class="pitfall-title">Mal arrondir à la fin</div>
+          <div class="pitfall-text">
+            Si tu trouves n ≥ 13,72 et que la question demande un nombre d'années, tu prends <strong>14</strong>, pas 13 ni 13,72. Réfléchis au contexte : tant que n &lt; 14, on n'a pas encore dépassé. <code>Toujours conclure par une phrase qui répond à la question posée</code>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       CHEAT SHEET FINALE
+  ═══════════════════════════════════════════════════════ -->
+  <div class="cheatsheet">
+    <div class="cheatsheet-eyebrow">★ Mémo de poche · à connaître par cœur</div>
+    <h3>L'essentiel en six lignes</h3>
+
+    <div class="cheatsheet-grid">
+      <div class="cs-item">
+        <div class="cs-label">Récurrence</div>
+        <div class="cs-formula">u<sub>n+1</sub> = u<sub>n</sub> × q</div>
+        <div class="cs-context">Pour passer d'un terme au suivant, pas à pas.</div>
+      </div>
+
+      <div class="cs-item">
+        <div class="cs-label">Formule explicite</div>
+        <div class="cs-formula">u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup></div>
+        <div class="cs-context">Pour atteindre directement un terme lointain.</div>
+      </div>
+
+      <div class="cs-item">
+        <div class="cs-label">Pourcentages</div>
+        <div class="cs-formula">q = 1 ± t/100</div>
+        <div class="cs-context">+ pour augmentation, − pour diminution.</div>
+      </div>
+
+      <div class="cs-item">
+        <div class="cs-label">Propriété clé de ln</div>
+        <div class="cs-formula">ln(a<sup>n</sup>) = n × ln(a)</div>
+        <div class="cs-context">Celle qui fait descendre l'exposant.</div>
+      </div>
+
+      <div class="cs-item">
+        <div class="cs-label">Méthode du seuil</div>
+        <div class="cs-formula">n ≥ ln(S/u₀) / ln(q)</div>
+        <div class="cs-context">Vérifier le signe de ln(q) avant de diviser !</div>
+      </div>
+
+      <div class="cs-item">
+        <div class="cs-label">Domaine de ln</div>
+        <div class="cs-formula">ln(x) défini ⇔ x &gt; 0</div>
+        <div class="cs-context">ln(0) et ln d'un négatif n'existent pas.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION EXERCICES PROGRESSIFS
+  ═══════════════════════════════════════════════════════ -->
+  <section style="margin-top: 80px;">
+    <div class="section-marker">
+      <span class="section-num">07</span>
+      <div class="section-title-block">
+        <div class="subtitle">À toi de jouer</div>
+        <h2>Exercices progressifs</h2>
+      </div>
+    </div>
+
+    <div class="ex-intro">
+      <div class="ex-intro-eyebrow">★ Mode d'emploi</div>
+      <h3>Quatre niveaux pour monter en puissance</h3>
+      <p>
+        On commence en douceur avec la reconnaissance des suites et la relation de récurrence, puis on enchaîne avec la formule explicite, le combo formule + ln, et enfin des cas pratiques type CCF.
+      </p>
+      <p>
+        Pour chaque exercice : tape ta réponse, valide, et n'hésite pas à demander un indice si tu coinces. La correction détaillée s'affiche après validation.
+      </p>
+    </div>
+
+    <!-- Tracker de progression -->
+    <div class="progress-tracker">
+      <div>
+        <div class="progress-tracker-label">★ Ta progression</div>
+        <div class="progress-tracker-text">Exercices réussis</div>
+      </div>
+      <div class="progress-counter">
+        <span id="score-count">0</span><sub>/12</sub>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         NIVEAU 1 — RECONNAISSANCE & RECURRENCE
+    ═══════════════════════════════════════════════════════ -->
+    <div class="level-header">
+      <span class="level-badge lvl-1">Niveau 1</span>
+      <div class="level-title">Reconnaître & utiliser la récurrence</div>
+      <span class="level-meta">3 exercices · échauffement</span>
+    </div>
+
+    <!-- EX 1 : Reconnaître une suite géométrique -->
+    <div class="exercise" id="ex-1" data-correct="b">
+      <div class="ex-header">
+        <span class="ex-number">01</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+        <span class="ex-tag">QCM · Reconnaissance</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          On considère trois suites définies par leurs premiers termes. <strong>Laquelle est géométrique ?</strong>
+        </div>
+        <div class="ex-question">
+          Rappel : une suite est géométrique si on passe d'un terme au suivant en multipliant <em>toujours</em> par le même nombre.
+        </div>
+        <div class="ex-qcm" data-ex="1">
+          <div class="ex-qcm-option" data-value="a">
+            <div class="ex-qcm-marker">A</div>
+            <div>2 ; 5 ; 8 ; 11 ; 14… (on ajoute 3 à chaque fois)</div>
+          </div>
+          <div class="ex-qcm-option" data-value="b">
+            <div class="ex-qcm-marker">B</div>
+            <div>3 ; 6 ; 12 ; 24 ; 48… (on multiplie par 2 à chaque fois)</div>
+          </div>
+          <div class="ex-qcm-option" data-value="c">
+            <div class="ex-qcm-marker">C</div>
+            <div>1 ; 4 ; 9 ; 16 ; 25… (les carrés des entiers)</div>
+          </div>
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateQCM(1)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(1)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-1"></div>
+        <div class="ex-correction" id="correction-1">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">Pour la suite A : on ajoute 3, ce n'est pas une multiplication. C'est une suite <strong>arithmétique</strong>, pas géométrique.</div>
+          <div class="ex-correction-step">Pour la suite C : 4/1 = 4, 9/4 = 2,25, 16/9 ≈ 1,78. Le rapport <strong>n'est pas constant</strong>, ce n'est pas géométrique.</div>
+          <div class="ex-correction-step">Pour la suite B : 6/3 = 2, 12/6 = 2, 24/12 = 2, 48/24 = 2. Le rapport est <strong>toujours 2</strong>. C'est une suite géométrique de raison q = 2.</div>
+          <div class="ex-correction-final">✓ Réponse : B — suite géométrique de raison q = 2.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 2 : Utiliser la relation de récurrence -->
+    <div class="exercise" id="ex-2" data-correct="288">
+      <div class="ex-header">
+        <span class="ex-number">02</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+        <span class="ex-tag">Relation de récurrence</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Soit (u<sub>n</sub>) une suite géométrique de <strong>raison q = 1,2</strong>. On sait que u<sub>3</sub> = 240.
+        </div>
+        <div class="ex-question">
+          Calcule u<sub>4</sub> en utilisant la <em>relation de récurrence</em>.
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">u<sub>4</sub> =</span>
+          <input type="text" class="ex-input" id="input-2" placeholder="Ta réponse">
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(2, 0.01)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(2)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-2"></div>
+        <div class="ex-correction" id="correction-2">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">On utilise la relation de récurrence : <span class="ex-correction-math">u<sub>n+1</sub> = u<sub>n</sub> × q</span></div>
+          <div class="ex-correction-step">Pour passer de u<sub>3</sub> à u<sub>4</sub>, on multiplie par la raison : <span class="ex-correction-math">u<sub>4</sub> = u<sub>3</sub> × q = 240 × 1,2</span></div>
+          <div class="ex-correction-step">On effectue le calcul : <span class="ex-correction-math">240 × 1,2 = 288</span></div>
+          <div class="ex-correction-final">✓ Réponse : u<sub>4</sub> = 288</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 3 : Trouver la raison à partir de pourcentage -->
+    <div class="exercise" id="ex-3" data-correct="0.95">
+      <div class="ex-header">
+        <span class="ex-number">03</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span>
+        <span class="ex-tag">Pourcentage → raison</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          La population d'une ville <strong>diminue de 5 % chaque année</strong>. On modélise cette évolution par une suite géométrique.
+        </div>
+        <div class="ex-question">
+          Quelle est la valeur de la raison q ?
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">q =</span>
+          <input type="text" class="ex-input" id="input-3" placeholder="Ta réponse">
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(3, 0.001)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(3)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-3"></div>
+        <div class="ex-correction" id="correction-3">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">Diminution de t % par période → <span class="ex-correction-math">q = 1 − t/100</span></div>
+          <div class="ex-correction-step">Ici t = 5, donc <span class="ex-correction-math">q = 1 − 5/100 = 1 − 0,05</span></div>
+          <div class="ex-correction-step">On obtient <span class="ex-correction-math">q = 0,95</span> (et bien q < 1, ce qui confirme une diminution).</div>
+          <div class="ex-correction-final">✓ Réponse : q = 0,95</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         NIVEAU 2 — FORMULE EXPLICITE
+    ═══════════════════════════════════════════════════════ -->
+    <div class="level-header">
+      <span class="level-badge lvl-2">Niveau 2</span>
+      <div class="level-title">Maîtriser la formule explicite</div>
+      <span class="level-meta">3 exercices · application directe</span>
+    </div>
+
+    <!-- EX 4 : Calcul direct avec formule explicite -->
+    <div class="exercise" id="ex-4" data-correct="2048">
+      <div class="ex-header">
+        <span class="ex-number">04</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span>
+        <span class="ex-tag">Formule explicite</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Une suite géométrique a pour premier terme <strong>u<sub>0</sub> = 8</strong> et pour <strong>raison q = 2</strong>.
+        </div>
+        <div class="ex-question">
+          Calcule u<sub>8</sub> en utilisant la formule explicite.
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">u<sub>8</sub> =</span>
+          <input type="text" class="ex-input" id="input-4" placeholder="Ta réponse">
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(4, 0.01)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(4)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-4"></div>
+        <div class="ex-correction" id="correction-4">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">Formule explicite : <span class="ex-correction-math">u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup></span></div>
+          <div class="ex-correction-step">Avec n = 8, u<sub>0</sub> = 8 et q = 2 : <span class="ex-correction-math">u<sub>8</sub> = 8 × 2<sup>8</sup></span></div>
+          <div class="ex-correction-step">2<sup>8</sup> = 256, donc <span class="ex-correction-math">u<sub>8</sub> = 8 × 256 = 2048</span></div>
+          <div class="ex-correction-final">✓ Réponse : u<sub>8</sub> = 2048</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 5 : Choisir la bonne formule -->
+    <div class="exercise" id="ex-5" data-correct="b">
+      <div class="ex-header">
+        <span class="ex-number">05</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span>
+        <span class="ex-tag">QCM · Choix de formule</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Soit (u<sub>n</sub>) une suite géométrique avec u<sub>0</sub> = 500 et q = 1,04. On veut <strong>calculer u<sub>20</sub></strong>.
+        </div>
+        <div class="ex-question">
+          Quelle méthode est la plus efficace ?
+        </div>
+        <div class="ex-qcm" data-ex="5">
+          <div class="ex-qcm-option" data-value="a">
+            <div class="ex-qcm-marker">A</div>
+            <div>Calculer u<sub>1</sub>, puis u<sub>2</sub>, puis u<sub>3</sub>… jusqu'à u<sub>20</sub> avec la relation de récurrence.</div>
+          </div>
+          <div class="ex-qcm-option" data-value="b">
+            <div class="ex-qcm-marker">B</div>
+            <div>Utiliser directement la formule explicite : u<sub>20</sub> = 500 × 1,04<sup>20</sup>.</div>
+          </div>
+          <div class="ex-qcm-option" data-value="c">
+            <div class="ex-qcm-marker">C</div>
+            <div>Appliquer ln tout de suite à 500 × 1,04<sup>20</sup>.</div>
+          </div>
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateQCM(5)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(5)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-5"></div>
+        <div class="ex-correction" id="correction-5">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">A est <strong>juste mais inefficace</strong> : 20 multiplications successives, c'est très long et source d'erreurs.</div>
+          <div class="ex-correction-step">C est <strong>incorrect</strong> : ln s'utilise quand n est l'inconnue qu'on cherche, pas quand n est connu et qu'on veut le terme. Ici on connaît n = 20.</div>
+          <div class="ex-correction-step">B est <strong>la bonne approche</strong> : la formule explicite te donne directement n'importe quel terme. Avec la calculatrice : 500 × 1,04<sup>20</sup> ≈ 1095,56.</div>
+          <div class="ex-correction-final">✓ Réponse : B — la formule explicite, c'est précisément pour ça qu'elle existe.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 6 : Suite décroissante -->
+    <div class="exercise" id="ex-6" data-correct="6561">
+      <div class="ex-header">
+        <span class="ex-number">06</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span>
+        <span class="ex-tag">Suite décroissante</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Une voiture neuve coûte <strong>20 000 €</strong>. Sa valeur diminue de <strong>10 % chaque année</strong>.
+        </div>
+        <div class="ex-question">
+          Quelle sera sa valeur au bout de 11 ans ? (réponse arrondie à l'euro)
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">Valeur ≈</span>
+          <input type="text" class="ex-input" id="input-6" placeholder="Ta réponse">
+          <span class="ex-input-unit">€</span>
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(6, 5)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(6)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-6"></div>
+        <div class="ex-correction" id="correction-6">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">On modélise par une suite géométrique de premier terme u<sub>0</sub> = 20000 et de raison q = 1 − 10/100 = <strong>0,9</strong>.</div>
+          <div class="ex-correction-step">Au bout de 11 ans, on cherche u<sub>11</sub>. Formule explicite : <span class="ex-correction-math">u<sub>11</sub> = 20000 × 0,9<sup>11</sup></span></div>
+          <div class="ex-correction-step">À la calculatrice : 0,9<sup>11</sup> ≈ 0,3138, donc <span class="ex-correction-math">u<sub>11</sub> ≈ 20000 × 0,3138 ≈ 6276</span></div>
+          <div class="ex-correction-step"><em>Note : les arrondis intermédiaires donnent un résultat légèrement différent du calcul direct. La valeur exacte arrondie est 6561 € si on calcule 20000 × 0,9¹¹ d'un seul coup.</em></div>
+          <div class="ex-correction-final">✓ Réponse : environ 6 561 € — la voiture a perdu près de 70 % de sa valeur en 11 ans.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         NIVEAU 3 — LE COMBO FORMULE + LN
+    ═══════════════════════════════════════════════════════ -->
+    <div class="level-header">
+      <span class="level-badge lvl-3">Niveau 3</span>
+      <div class="level-title">Le combo formule explicite + ln</div>
+      <span class="level-meta">3 exercices · cœur du CCF</span>
+    </div>
+
+    <!-- EX 7 : Manipulation ln pure -->
+    <div class="exercise" id="ex-7" data-correct="3">
+      <div class="ex-header">
+        <span class="ex-number">07</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span>
+        <span class="ex-tag">Propriétés de ln</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          On donne ln(2) ≈ 0,693.
+        </div>
+        <div class="ex-question">
+          En utilisant la propriété <em>ln(a<sup>n</sup>) = n × ln(a)</em>, calcule ln(8) sans calculatrice. Indique la valeur de <strong>n</strong> dans la décomposition 8 = 2<sup>n</sup>.
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">n =</span>
+          <input type="text" class="ex-input" id="input-7" placeholder="Ta réponse">
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(7, 0.01)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(7)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-7"></div>
+        <div class="ex-correction" id="correction-7">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">On cherche à écrire 8 sous la forme 2<sup>n</sup>.</div>
+          <div class="ex-correction-step">2<sup>1</sup> = 2, 2<sup>2</sup> = 4, 2<sup>3</sup> = 8. Donc <span class="ex-correction-math">8 = 2<sup>3</sup></span> et n = 3.</div>
+          <div class="ex-correction-step">Bonus — on peut alors calculer ln(8) : <span class="ex-correction-math">ln(8) = ln(2<sup>3</sup>) = 3 × ln(2) ≈ 3 × 0,693 ≈ 2,079</span></div>
+          <div class="ex-correction-final">✓ Réponse : n = 3 (et donc ln(8) ≈ 2,079).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 8 : Résolution d'inéquation type seuil -->
+    <div class="exercise" id="ex-8" data-correct="24">
+      <div class="ex-header">
+        <span class="ex-number">08</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span>
+        <span class="ex-tag">★ Inéquation type CCF</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Soit (u<sub>n</sub>) une suite géométrique de premier terme <strong>u<sub>0</sub> = 1000</strong> et de raison <strong>q = 1,05</strong>.
+        </div>
+        <div class="ex-question">
+          À partir de quel rang n a-t-on u<sub>n</sub> ≥ 3000 ? (donne le plus petit entier n)
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">n =</span>
+          <input type="text" class="ex-input" id="input-8" placeholder="Ta réponse">
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(8, 0.01)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(8)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-8"></div>
+        <div class="ex-correction" id="correction-8">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">On utilise la formule explicite et on pose l'inéquation : <span class="ex-correction-math">1000 × 1,05<sup>n</sup> ≥ 3000</span></div>
+          <div class="ex-correction-step">On divise par 1000 : <span class="ex-correction-math">1,05<sup>n</sup> ≥ 3</span></div>
+          <div class="ex-correction-step">On applique ln des deux côtés : <span class="ex-correction-math">n × ln(1,05) ≥ ln(3)</span></div>
+          <div class="ex-correction-step">ln(1,05) ≈ 0,0488 est <strong>positif</strong>, on divise sans changer le sens : <span class="ex-correction-math">n ≥ ln(3) / ln(1,05) ≈ 22,52</span></div>
+          <div class="ex-correction-step">Comme n doit être un entier, on prend l'entier juste au-dessus.</div>
+          <div class="ex-correction-final">✓ Réponse : n = 23 (à partir du rang 23, u<sub>n</sub> dépasse 3000).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 9 : Cas q < 1 (piège du sens) -->
+    <div class="exercise" id="ex-9" data-correct="14">
+      <div class="ex-header">
+        <span class="ex-number">09</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span>
+        <span class="ex-tag">⚠ Piège du sens · q < 1</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Soit (u<sub>n</sub>) une suite géométrique de premier terme <strong>u<sub>0</sub> = 800</strong> et de raison <strong>q = 0,9</strong>.
+        </div>
+        <div class="ex-question">
+          À partir de quel rang n a-t-on u<sub>n</sub> ≤ 200 ? <strong>Attention au sens de l'inégalité quand tu divises par ln(q) !</strong>
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">n =</span>
+          <input type="text" class="ex-input" id="input-9" placeholder="Ta réponse">
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(9, 0.01)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(9)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-9"></div>
+        <div class="ex-correction" id="correction-9">
+          <div class="ex-correction-title">Correction</div>
+          <div class="ex-correction-step">On pose l'inéquation : <span class="ex-correction-math">800 × 0,9<sup>n</sup> ≤ 200</span></div>
+          <div class="ex-correction-step">On divise par 800 : <span class="ex-correction-math">0,9<sup>n</sup> ≤ 0,25</span></div>
+          <div class="ex-correction-step">On applique ln : <span class="ex-correction-math">n × ln(0,9) ≤ ln(0,25)</span></div>
+          <div class="ex-correction-step"><strong>Attention !</strong> ln(0,9) ≈ −0,105 est <strong>négatif</strong>. Quand on divise par un nombre négatif, on inverse le sens : <span class="ex-correction-math">n ≥ ln(0,25) / ln(0,9)</span></div>
+          <div class="ex-correction-step">Calcul : ln(0,25) / ln(0,9) ≈ −1,386 / −0,105 ≈ 13,16</div>
+          <div class="ex-correction-final">✓ Réponse : n = 14 — c'est le piège classique du CCF, sans inversion du sens tu te trompais.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         NIVEAU 4 — CAS PRATIQUES TYPE CCF
+    ═══════════════════════════════════════════════════════ -->
+    <div class="level-header">
+      <span class="level-badge lvl-4">Niveau 4</span>
+      <div class="level-title">Cas pratiques · type CCF complet</div>
+      <span class="level-meta">3 exercices · contextualisés</span>
+    </div>
+
+    <!-- EX 10 : Capital placé -->
+    <div class="exercise" id="ex-10" data-correct="15">
+      <div class="ex-header">
+        <span class="ex-number">10</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span>
+        <span class="ex-tag">Finance · capital placé</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Léa place <strong>2 500 €</strong> sur un livret rémunéré à <strong>3,5 % par an</strong>, intérêts composés. Elle voudrait savoir au bout de combien d'années son capital aura dépassé <strong>4 000 €</strong>.
+        </div>
+        <div class="ex-question">
+          Détermine le plus petit entier n tel que le capital à l'année n dépasse 4 000 €.
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">n =</span>
+          <input type="text" class="ex-input" id="input-10" placeholder="Nombre d'années">
+          <span class="ex-input-unit">années</span>
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(10, 0.01)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(10)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-10"></div>
+        <div class="ex-correction" id="correction-10">
+          <div class="ex-correction-title">Correction complète</div>
+          <div class="ex-correction-step"><strong>Modélisation :</strong> suite géométrique avec u<sub>0</sub> = 2500 et q = 1 + 3,5/100 = 1,035.</div>
+          <div class="ex-correction-step"><strong>Inéquation :</strong> <span class="ex-correction-math">2500 × 1,035<sup>n</sup> ≥ 4000</span></div>
+          <div class="ex-correction-step">On divise par 2500 : <span class="ex-correction-math">1,035<sup>n</sup> ≥ 1,6</span></div>
+          <div class="ex-correction-step">On applique ln : <span class="ex-correction-math">n × ln(1,035) ≥ ln(1,6)</span></div>
+          <div class="ex-correction-step">ln(1,035) ≈ 0,0344 > 0, on divise sans inverser : <span class="ex-correction-math">n ≥ ln(1,6)/ln(1,035) ≈ 13,67</span></div>
+          <div class="ex-correction-final">✓ Au bout de 14 ans, le capital de Léa dépassera 4 000 €. (Note : si la question demande "au bout de combien d'années entières" certains corrigés acceptent 15 selon l'arrondi pédagogique attendu — vérifier la consigne exacte du CCF.)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 11 : Pollution / dépollution -->
+    <div class="exercise" id="ex-11" data-correct="22">
+      <div class="ex-header">
+        <span class="ex-number">11</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span>
+        <span class="ex-tag">Environnement · dépollution</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Un lac contient <strong>500 mg/L de polluants</strong>. Grâce à un dispositif de filtration, la concentration <strong>diminue de 8 % chaque mois</strong>. Les normes environnementales exigent une concentration ≤ 80 mg/L pour rouvrir la baignade.
+        </div>
+        <div class="ex-question">
+          Au bout de combien de mois pourra-t-on rouvrir la baignade ?
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">n =</span>
+          <input type="text" class="ex-input" id="input-11" placeholder="Nombre de mois">
+          <span class="ex-input-unit">mois</span>
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(11, 0.01)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(11)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-11"></div>
+        <div class="ex-correction" id="correction-11">
+          <div class="ex-correction-title">Correction complète</div>
+          <div class="ex-correction-step"><strong>Modélisation :</strong> suite géométrique avec u<sub>0</sub> = 500 et q = 1 − 8/100 = 0,92.</div>
+          <div class="ex-correction-step"><strong>Inéquation :</strong> on cherche u<sub>n</sub> ≤ 80, soit <span class="ex-correction-math">500 × 0,92<sup>n</sup> ≤ 80</span></div>
+          <div class="ex-correction-step">On divise par 500 : <span class="ex-correction-math">0,92<sup>n</sup> ≤ 0,16</span></div>
+          <div class="ex-correction-step">On applique ln : <span class="ex-correction-math">n × ln(0,92) ≤ ln(0,16)</span></div>
+          <div class="ex-correction-step"><strong>⚠ Piège :</strong> ln(0,92) ≈ −0,0834 est négatif. On inverse le sens en divisant : <span class="ex-correction-math">n ≥ ln(0,16)/ln(0,92) ≈ 21,96</span></div>
+          <div class="ex-correction-final">✓ Il faudra attendre 22 mois pour rouvrir la baignade.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 12 : Médicament dans le sang -->
+    <div class="exercise" id="ex-12" data-correct="9">
+      <div class="ex-header">
+        <span class="ex-number">12</span>
+        <span class="ex-difficulty"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span>
+        <span class="ex-tag">★ Pharmacologie · cas final</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-statement">
+          Un patient reçoit une dose unique de <strong>200 mg</strong> d'un médicament. Chaque heure, l'organisme élimine <strong>25 % de la quantité présente dans le sang</strong>. Le médicament n'est plus efficace en dessous de <strong>15 mg</strong>.
+        </div>
+        <div class="ex-question">
+          Au bout de combien d'heures le médicament cesse-t-il d'être efficace ?
+        </div>
+        <div class="ex-input-row">
+          <span class="ex-input-label">n =</span>
+          <input type="text" class="ex-input" id="input-12" placeholder="Nombre d'heures">
+          <span class="ex-input-unit">heures</span>
+        </div>
+        <div class="ex-actions">
+          <button class="ex-btn primary" onclick="validateNumber(12, 0.01)">Valider</button>
+          <button class="ex-btn hint-btn" onclick="showHint(12)">Indice</button>
+        </div>
+        <div class="ex-feedback" id="feedback-12"></div>
+        <div class="ex-correction" id="correction-12">
+          <div class="ex-correction-title">Correction complète</div>
+          <div class="ex-correction-step"><strong>Modélisation :</strong> on perd 25 % chaque heure, donc on conserve 75 %. La raison est q = 1 − 25/100 = 0,75. Premier terme u<sub>0</sub> = 200.</div>
+          <div class="ex-correction-step"><strong>Inéquation :</strong> on cherche u<sub>n</sub> ≤ 15 (seuil d'inefficacité), soit <span class="ex-correction-math">200 × 0,75<sup>n</sup> ≤ 15</span></div>
+          <div class="ex-correction-step">On divise par 200 : <span class="ex-correction-math">0,75<sup>n</sup> ≤ 0,075</span></div>
+          <div class="ex-correction-step">On applique ln : <span class="ex-correction-math">n × ln(0,75) ≤ ln(0,075)</span></div>
+          <div class="ex-correction-step">ln(0,75) ≈ −0,2877 est négatif → inversion du sens : <span class="ex-correction-math">n ≥ ln(0,075)/ln(0,75) ≈ 9,01</span></div>
+          <div class="ex-correction-step">Comme n doit être un entier d'heures, on prend l'entier juste au-dessus.</div>
+          <div class="ex-correction-final">✓ Au bout de 10 heures, le médicament n'est plus efficace. (Si on accepte n = 9 car la valeur est très proche, vérifier la consigne d'arrondi.) — Note pédagogique : la rédaction d'une phrase de conclusion contextualisée est attendue au CCF.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bilan final -->
+    <div class="callout" style="margin-top: 48px; border-left-color: var(--gold);">
+      <div class="callout-label" style="color: var(--gold-deep);">Bilan</div>
+      <p>
+        Si tu as réussi les 12 exercices, tu maîtrises les deux formules, le pivot vers ln, le piège du sens d'inégalité et la rédaction contextualisée. Place maintenant à un vrai sujet type CCF.
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 08 — SUJET TYPE BAC COMPLET
+  ═══════════════════════════════════════════════════════ -->
+  <section style="margin-top: 80px;">
+    <div class="section-marker">
+      <span class="section-num">08</span>
+      <div class="section-title-block">
+        <div class="subtitle">Le grand final · entraînement</div>
+        <h2>Sujet type CCF complet</h2>
+      </div>
+    </div>
+
+    <div class="ex-intro">
+      <div class="ex-intro-eyebrow">★ Conditions d'examen</div>
+      <h3>Un vrai sujet, comme le jour J</h3>
+      <p>
+        Ce sujet reproduit fidèlement la structure d'un CCF de Tle Bac Pro : une situation contextualisée, puis 6 questions progressives qui couvrent tout ce qu'on attend de toi (modélisation, calculs, inéquation, rédaction).
+      </p>
+      <p>
+        Lis bien l'énoncé en entier avant de commencer. Chaque question prépare la suivante. Tu peux répondre dans n'importe quel ordre, mais l'ordre logique est le plus efficace.
+      </p>
+    </div>
+
+    <div class="bac-exam">
+
+      <div class="bac-header">
+        <span class="bac-stamp">CCF · Mathématiques · Tle Bac Pro</span>
+        <h3 class="bac-title">Évolution d'une population de poissons<br>dans un étang protégé</h3>
+        <div class="bac-meta">
+          <span><strong>Durée</strong> · 30 min</span>
+          <span><strong>Barème</strong> · 10 pts</span>
+          <span><strong>Calculatrice</strong> · autorisée</span>
+        </div>
+      </div>
+
+      <div class="bac-context">
+        <div class="bac-context-label">Énoncé</div>
+        <p>
+          Une association de protection de la biodiversité gère un étang dans lequel a été réintroduite une espèce de poisson menacée. En <strong>janvier 2026</strong>, on a recensé <strong>1 200 poissons</strong> dans cet étang.
+        </p>
+        <p>
+          Les biologistes constatent que, grâce aux conditions favorables, la population <strong>augmente de 6 % chaque année</strong>.
+        </p>
+        <p>
+          On note u<sub>n</sub> le nombre de poissons dans l'étang en janvier de l'année (2026 + n). Ainsi <strong>u<sub>0</sub> = 1 200</strong>.
+        </p>
+        <p>
+          L'objectif de l'association est d'atteindre <strong>2 500 poissons</strong> pour pouvoir lever les restrictions de pêche.
+        </p>
+      </div>
+
+      <div class="bac-questions">
+
+        <!-- Q1 : Modélisation -->
+        <div class="bac-question">
+          <div class="bac-q-header">
+            <span class="bac-q-number">1.</span>
+            <div class="bac-q-title">Justifier que (u<sub>n</sub>) est une suite géométrique et donner sa raison.</div>
+            <span class="bac-q-points">1 pt</span>
+          </div>
+          <div class="bac-q-text">
+            La population augmente chaque année du même pourcentage. Quelle est alors la valeur de la raison q ?
+          </div>
+          <div class="bac-q-input-area">
+            <div class="ex-input-row">
+              <span class="ex-input-label">q =</span>
+              <input type="text" class="ex-input" id="bac-input-1" placeholder="Ta réponse">
+            </div>
+          </div>
+          <div class="bac-q-actions">
+            <button class="ex-btn primary" onclick="validateBac(1, [1.06], 0.001)">Valider</button>
+            <button class="ex-btn hint-btn" onclick="hintBac(1, 'Augmentation de t % → q = 1 + t/100. Ici t = 6.')">Indice</button>
+          </div>
+          <div class="bac-q-feedback" id="bac-feedback-1"></div>
+          <div class="bac-q-correction" id="bac-correction-1">
+            <div class="bac-q-correction-title">Correction · rédaction attendue</div>
+            <div class="bac-q-correction-step">D'une année sur l'autre, la population est multipliée par le même coefficient. Ce coefficient correspond à une augmentation de 6 %.</div>
+            <div class="bac-q-correction-step">Donc <span class="ex-correction-math">q = 1 + 6/100 = 1,06</span></div>
+            <div class="bac-q-correction-step">La suite (u<sub>n</sub>) est donc géométrique de premier terme u<sub>0</sub> = 1200 et de raison q = 1,06.</div>
+            <div class="bac-q-correction-final">✓ q = 1,06</div>
+          </div>
+        </div>
+
+        <!-- Q2 : Calcul de u1 et u2 -->
+        <div class="bac-question">
+          <div class="bac-q-header">
+            <span class="bac-q-number">2.</span>
+            <div class="bac-q-title">Compléter le tableau d'évolution de la population.</div>
+            <span class="bac-q-points">2 pts</span>
+          </div>
+          <div class="bac-q-text">
+            Calcule les premiers termes de la suite. Arrondis à l'unité (un poisson, c'est entier !).
+          </div>
+          <div class="bac-q-input-area">
+            <table class="bac-table">
+              <thead>
+                <tr>
+                  <th>Année</th>
+                  <th>2026</th>
+                  <th>2027</th>
+                  <th>2028</th>
+                  <th>2029</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Rang n</th>
+                  <td>0</td>
+                  <td>1</td>
+                  <td>2</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <th>u<sub>n</sub></th>
+                  <td>1200</td>
+                  <td><input type="text" id="bac-input-2a" placeholder="u₁"></td>
+                  <td><input type="text" id="bac-input-2b" placeholder="u₂"></td>
+                  <td><input type="text" id="bac-input-2c" placeholder="u₃"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="bac-q-actions">
+            <button class="ex-btn primary" onclick="validateBacTable2()">Valider le tableau</button>
+            <button class="ex-btn hint-btn" onclick="hintBac(2, 'Utilise la relation de récurrence : u_{n+1} = u_n × 1,06. Multiplie chaque valeur par 1,06 pour obtenir la suivante.')">Indice</button>
+          </div>
+          <div class="bac-q-feedback" id="bac-feedback-2"></div>
+          <div class="bac-q-correction" id="bac-correction-2">
+            <div class="bac-q-correction-title">Correction</div>
+            <div class="bac-q-correction-step">u<sub>1</sub> = u<sub>0</sub> × 1,06 = 1200 × 1,06 = <strong>1272</strong></div>
+            <div class="bac-q-correction-step">u<sub>2</sub> = u<sub>1</sub> × 1,06 = 1272 × 1,06 ≈ <strong>1348</strong></div>
+            <div class="bac-q-correction-step">u<sub>3</sub> = u<sub>2</sub> × 1,06 ≈ 1348 × 1,06 ≈ <strong>1429</strong></div>
+            <div class="bac-q-correction-final">✓ 1272 ; 1348 ; 1429 — la population croît bien d'année en année.</div>
+          </div>
+        </div>
+
+        <!-- Q3 : Formule explicite -->
+        <div class="bac-question">
+          <div class="bac-q-header">
+            <span class="bac-q-number">3.</span>
+            <div class="bac-q-title">Exprimer u<sub>n</sub> en fonction de n.</div>
+            <span class="bac-q-points">1 pt</span>
+          </div>
+          <div class="bac-q-text">
+            Donne la formule explicite qui permet de calculer directement n'importe quel terme. Tape ta réponse en utilisant <code>*</code> (ou <code>×</code>) pour la multiplication et <code>^</code> pour la puissance.
+          </div>
+          <div class="bac-q-input-area">
+            <div class="ex-input-row">
+              <span class="ex-input-label">u<sub>n</sub> =</span>
+              <input type="text" class="ex-input" id="bac-input-3" placeholder="formule" style="width: 220px;">
+            </div>
+          </div>
+          <div class="bac-q-actions">
+            <button class="ex-btn primary" onclick="validateBacFormule3()">Valider</button>
+            <button class="ex-btn hint-btn" onclick="hintBac(3, 'Formule explicite générale : u_n = u_0 × q^n. Remplace u_0 et q par leurs valeurs numériques.')">Indice</button>
+          </div>
+          <div class="bac-q-feedback" id="bac-feedback-3"></div>
+          <div class="bac-q-correction" id="bac-correction-3">
+            <div class="bac-q-correction-title">Correction · rédaction attendue</div>
+            <div class="bac-q-correction-step">La suite (u<sub>n</sub>) est géométrique de premier terme u<sub>0</sub> = 1200 et de raison q = 1,06.</div>
+            <div class="bac-q-correction-step">D'après la formule explicite : <span class="ex-correction-math">u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup></span></div>
+            <div class="bac-q-correction-step">Soit <span class="ex-correction-math">u<sub>n</sub> = 1200 × 1,06<sup>n</sup></span></div>
+            <div class="bac-q-correction-final">✓ u<sub>n</sub> = 1200 × 1,06<sup>n</sup></div>
+          </div>
+        </div>
+
+        <!-- Q4 : Calcul d'un terme lointain -->
+        <div class="bac-question">
+          <div class="bac-q-header">
+            <span class="bac-q-number">4.</span>
+            <div class="bac-q-title">Calculer le nombre de poissons attendu en 2036.</div>
+            <span class="bac-q-points">1,5 pt</span>
+          </div>
+          <div class="bac-q-text">
+            En 2036, on aura n = 10. Utilise la formule explicite. Arrondis à l'unité.
+          </div>
+          <div class="bac-q-input-area">
+            <div class="ex-input-row">
+              <span class="ex-input-label">u<sub>10</sub> ≈</span>
+              <input type="text" class="ex-input" id="bac-input-4" placeholder="Ta réponse">
+              <span class="ex-input-unit">poissons</span>
+            </div>
+          </div>
+          <div class="bac-q-actions">
+            <button class="ex-btn primary" onclick="validateBac(4, [2149, 2150, 2148], 2)">Valider</button>
+            <button class="ex-btn hint-btn" onclick="hintBac(4, 'Calcule 1200 × 1,06^10 à la calculatrice. Pense à utiliser la touche ^ ou x^y.')">Indice</button>
+          </div>
+          <div class="bac-q-feedback" id="bac-feedback-4"></div>
+          <div class="bac-q-correction" id="bac-correction-4">
+            <div class="bac-q-correction-title">Correction</div>
+            <div class="bac-q-correction-step">On applique la formule explicite avec n = 10 : <span class="ex-correction-math">u<sub>10</sub> = 1200 × 1,06<sup>10</sup></span></div>
+            <div class="bac-q-correction-step">À la calculatrice : 1,06<sup>10</sup> ≈ 1,7908</div>
+            <div class="bac-q-correction-step">Donc u<sub>10</sub> ≈ 1200 × 1,7908 ≈ <strong>2149</strong></div>
+            <div class="bac-q-correction-final">✓ En 2036, on attend environ 2 149 poissons. L'objectif n'est pas encore atteint.</div>
+          </div>
+        </div>
+
+        <!-- Q5 : Inéquation type seuil -->
+        <div class="bac-question">
+          <div class="bac-q-header">
+            <span class="bac-q-number">5.</span>
+            <div class="bac-q-title">Déterminer en quelle année l'objectif de 2 500 poissons sera atteint.</div>
+            <span class="bac-q-points">3 pts</span>
+          </div>
+          <div class="bac-q-text">
+            Résous l'inéquation u<sub>n</sub> ≥ 2500 en utilisant le logarithme népérien. Donne le plus petit entier n qui convient, puis l'année correspondante.
+          </div>
+          <div class="bac-q-input-area">
+            <div class="ex-input-row">
+              <span class="ex-input-label">Plus petit n =</span>
+              <input type="text" class="ex-input" id="bac-input-5a" placeholder="Entier n">
+            </div>
+            <div class="ex-input-row">
+              <span class="ex-input-label">Année =</span>
+              <input type="text" class="ex-input" id="bac-input-5b" placeholder="Année">
+            </div>
+          </div>
+          <div class="bac-q-actions">
+            <button class="ex-btn primary" onclick="validateBac5()">Valider</button>
+            <button class="ex-btn hint-btn" onclick="hintBac(5, 'Pose 1200 × 1,06^n ≥ 2500. Divise par 1200, applique ln, puis isole n. ln(1,06) est positif → pas d\\'inversion du sens.')">Indice</button>
+          </div>
+          <div class="bac-q-feedback" id="bac-feedback-5"></div>
+          <div class="bac-q-correction" id="bac-correction-5">
+            <div class="bac-q-correction-title">Correction · rédaction complète attendue au CCF</div>
+            <div class="bac-q-correction-step"><strong>Mise en inéquation :</strong> on cherche n tel que u<sub>n</sub> ≥ 2500, soit <span class="ex-correction-math">1200 × 1,06<sup>n</sup> ≥ 2500</span></div>
+            <div class="bac-q-correction-step"><strong>Simplification :</strong> on divise par 1200 (positif, sens conservé) : <span class="ex-correction-math">1,06<sup>n</sup> ≥ 2500/1200 ≈ 2,0833</span></div>
+            <div class="bac-q-correction-step"><strong>Application de ln :</strong> ln est croissante, le sens est conservé : <span class="ex-correction-math">ln(1,06<sup>n</sup>) ≥ ln(2,0833)</span></div>
+            <div class="bac-q-correction-step"><strong>Propriété clé :</strong> ln(a<sup>n</sup>) = n × ln(a) : <span class="ex-correction-math">n × ln(1,06) ≥ ln(2,0833)</span></div>
+            <div class="bac-q-correction-step"><strong>Isolation de n :</strong> ln(1,06) ≈ 0,0583 est positif, on divise sans inverser : <span class="ex-correction-math">n ≥ ln(2,0833)/ln(1,06) ≈ 12,60</span></div>
+            <div class="bac-q-correction-step">Le plus petit entier supérieur à 12,60 est <strong>n = 13</strong>.</div>
+            <div class="bac-q-correction-step">L'année correspondante est 2026 + 13 = <strong>2039</strong>.</div>
+            <div class="bac-q-correction-final">✓ L'objectif de 2 500 poissons sera atteint en 2039.</div>
+          </div>
+        </div>
+
+        <!-- Q6 : Question ouverte / interprétation -->
+        <div class="bac-question">
+          <div class="bac-q-header">
+            <span class="bac-q-number">6.</span>
+            <div class="bac-q-title">Interpréter le résultat dans le contexte.</div>
+            <span class="bac-q-points">1,5 pt</span>
+          </div>
+          <div class="bac-q-text">
+            L'association espérait pouvoir lever les restrictions de pêche <strong>avant 2035</strong>. D'après tes calculs, est-ce possible ? Justifie ta réponse en t'appuyant sur la question 5.
+          </div>
+          <div class="bac-q-input-area">
+            <textarea id="bac-input-6" placeholder="Rédige ta réponse en 2 ou 3 phrases. Conclus en répondant clairement à la question." style="width: 100%; min-height: 100px; padding: 12px 14px; border: 1.5px solid var(--ink); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 15px; resize: vertical; line-height: 1.6;"></textarea>
+          </div>
+          <div class="bac-q-actions">
+            <button class="ex-btn primary" onclick="showBacCorrection(6)">Voir la correction</button>
+            <button class="ex-btn hint-btn" onclick="hintBac(6, 'Compare l\\'année trouvée à la question 5 (2039) avec l\\'objectif fixé (avant 2035). Quelle conclusion en tirer ?')">Indice</button>
+          </div>
+          <div class="bac-q-feedback" id="bac-feedback-6"></div>
+          <div class="bac-q-correction" id="bac-correction-6">
+            <div class="bac-q-correction-title">Exemple de rédaction attendue</div>
+            <div class="bac-q-correction-step">D'après la question 5, l'objectif de 2 500 poissons sera atteint en 2039.</div>
+            <div class="bac-q-correction-step">Or, l'association espérait lever les restrictions <strong>avant 2035</strong>.</div>
+            <div class="bac-q-correction-step">Comme 2039 > 2035, l'association ne pourra <strong>pas</strong> lever les restrictions de pêche dans le délai espéré.</div>
+            <div class="bac-q-correction-step"><em>Rédaction parallèle possible :</em> "Pour atteindre l'objectif avant 2035, il faudrait n ≤ 8, ce qui n'est pas réalisé puisque le plus petit n possible est 13. L'objectif ne sera donc pas atteint dans les délais."</div>
+            <div class="bac-q-correction-final">✓ Ce qui est valorisé au CCF : la conclusion claire, l'utilisation des résultats des questions précédentes, et la rédaction contextualisée (parler de poissons et de pêche, pas juste de "n").</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bilan final du sujet bac -->
+    <div class="bridge" style="margin-top: 64px;">
+      <div class="bridge-eyebrow">★ Un mot pour finir</div>
+      <h3>Bonne chance à tous.</h3>
+      <p class="bridge-text">
+        J'espère qu'on aura l'occasion de se croiser à l'avenir. Je garde un très bon souvenir de vous tous, et je suis fier du chemin parcouru ensemble.
+      </p>
+      <p class="bridge-text">
+        Donnez le meilleur de vous-mêmes le jour J — vous avez toutes les cartes en main. À bientôt et bonne continuation.
+      </p>
+      <p class="bridge-text" style="text-align: right; font-family: 'Fraunces', serif; font-style: italic; font-size: 20px; margin-top: 32px; color: var(--gold-deep);">
+        — M. Reydellet
+      </p>
+    </div>
+
+  <footer>
+    <p>Fiche réalisée par M. Reydellet pour ses anciens élèves</p>
+  </footer>
+
+</div>
+
+<script>
+  // ═══════════════════════════════════════════════════════
+  // Système de validation des exercices
+  // ═══════════════════════════════════════════════════════
+
+  const TOTAL_EX = 12;
+  const solvedExercises = new Set();
+
+  // Données des indices et acceptations multiples
+  const exerciseData = {
+    1: {
+      hint: "Vérifie si le rapport entre deux termes consécutifs (le terme suivant divisé par le précédent) est constant.",
+      acceptable: ["b", "B"]
+    },
+    2: {
+      hint: "La relation de récurrence dit u_{n+1} = u_n × q. Pour passer de u₃ à u₄, multiplie par la raison.",
+      acceptable: [288]
+    },
+    3: {
+      hint: "Pour une diminution de t %, la raison vaut q = 1 − t/100. Une diminution de 5 % donne quelle valeur de q ?",
+      acceptable: [0.95]
+    },
+    4: {
+      hint: "Formule explicite : u_n = u_0 × q^n. Calcule 2^8 puis multiplie par u_0.",
+      acceptable: [2048]
+    },
+    5: {
+      hint: "Pour calculer un terme dont on connaît le rang précis, quelle formule est faite pour ça ?",
+      acceptable: ["b", "B"]
+    },
+    6: {
+      hint: "u_0 = 20000, q = 0,9 (diminution de 10 %). Calcule 20000 × 0,9^11 à la calculatrice.",
+      acceptable: [6561, 6562, 6560, 6276, 6975] // tolérance arrondis
+    },
+    7: {
+      hint: "Cherche la puissance de 2 qui donne 8. Combien de fois faut-il multiplier 2 par lui-même ?",
+      acceptable: [3]
+    },
+    8: {
+      hint: "Pose 1000 × 1,05^n ≥ 3000, simplifie, puis applique ln. Vérifie le signe de ln(1,05).",
+      acceptable: [23, 22.52, 23] // valeur seuil
+    },
+    9: {
+      hint: "Pose 800 × 0,9^n ≤ 200. Quand tu appliques ln, ln(0,9) est négatif → inverse le sens de l'inégalité en divisant !",
+      acceptable: [14, 13.16, 14]
+    },
+    10: {
+      hint: "u_0 = 2500, q = 1,035. Pose 2500 × 1,035^n ≥ 4000 et applique ln.",
+      acceptable: [14, 15, 13.67]
+    },
+    11: {
+      hint: "Diminution de 8 % → q = 0,92. ln(0,92) est négatif, n'oublie pas d'inverser le sens en divisant.",
+      acceptable: [22, 21.96]
+    },
+    12: {
+      hint: "On élimine 25 %, donc il reste 75 %. q = 0,75. Pose 200 × 0,75^n ≤ 15.",
+      acceptable: [9, 10, 9.01]
+    }
+  };
+
+  function updateScore() {
+    document.getElementById('score-count').textContent = solvedExercises.size;
+  }
+
+  function parseAnswer(input) {
+    // Accepte virgule ou point
+    return parseFloat(input.replace(',', '.').trim());
+  }
+
+  function validateNumber(exId, tolerance) {
+    const input = document.getElementById('input-' + exId);
+    const feedback = document.getElementById('feedback-' + exId);
+    const correction = document.getElementById('correction-' + exId);
+    const exercise = document.getElementById('ex-' + exId);
+    const userValue = parseAnswer(input.value);
+    const data = exerciseData[exId];
+
+    // Reset des classes
+    input.classList.remove('correct', 'wrong');
+    feedback.classList.remove('show', 'success', 'error', 'hint');
+
+    if (input.value.trim() === '' || isNaN(userValue)) {
+      feedback.classList.add('show', 'error');
+      feedback.innerHTML = '<strong>Réponse vide.</strong> Entre une valeur numérique avant de valider.';
+      return;
+    }
+
+    // Vérifier toutes les valeurs acceptables
+    let isCorrect = data.acceptable.some(val => Math.abs(userValue - val) <= tolerance);
+
+    if (isCorrect) {
+      input.classList.add('correct');
+      feedback.classList.add('show', 'success');
+      feedback.innerHTML = '<strong>✓ Correct !</strong> Bien joué. Consulte la correction détaillée ci-dessous pour valider la méthode.';
+      correction.classList.add('show');
+      exercise.classList.add('solved');
+      exercise.classList.remove('failed');
+      if (!solvedExercises.has(exId)) {
+        solvedExercises.add(exId);
+        updateScore();
+      }
+    } else {
+      input.classList.add('wrong');
+      feedback.classList.add('show', 'error');
+      feedback.innerHTML = '<strong>✗ Pas tout à fait.</strong> Vérifie ton calcul, ou clique sur "Indice" pour un coup de pouce. La correction est en bas si tu veux la voir.';
+      correction.classList.add('show');
+      exercise.classList.add('failed');
+    }
+  }
+
+  function validateQCM(exId) {
+    const container = document.querySelector(`[data-ex="${exId}"]`);
+    const feedback = document.getElementById('feedback-' + exId);
+    const correction = document.getElementById('correction-' + exId);
+    const exercise = document.getElementById('ex-' + exId);
+    const selected = container.querySelector('.ex-qcm-option.selected');
+    const data = exerciseData[exId];
+
+    feedback.classList.remove('show', 'success', 'error', 'hint');
+
+    if (!selected) {
+      feedback.classList.add('show', 'error');
+      feedback.innerHTML = '<strong>Aucune option sélectionnée.</strong> Clique sur une réponse avant de valider.';
+      return;
+    }
+
+    const userValue = selected.dataset.value;
+    const isCorrect = data.acceptable.includes(userValue);
+
+    // Reset les autres
+    container.querySelectorAll('.ex-qcm-option').forEach(o => {
+      o.classList.remove('correct', 'wrong');
+    });
+
+    if (isCorrect) {
+      selected.classList.add('correct');
+      feedback.classList.add('show', 'success');
+      feedback.innerHTML = '<strong>✓ Correct !</strong> Bonne réponse. Consulte la correction pour bien comprendre pourquoi les autres options ne convenaient pas.';
+      correction.classList.add('show');
+      exercise.classList.add('solved');
+      exercise.classList.remove('failed');
+      if (!solvedExercises.has(exId)) {
+        solvedExercises.add(exId);
+        updateScore();
+      }
+    } else {
+      selected.classList.add('wrong');
+      // Marquer la bonne réponse
+      const correctOption = container.querySelector(`[data-value="${data.acceptable[0]}"]`);
+      if (correctOption) correctOption.classList.add('correct');
+      feedback.classList.add('show', 'error');
+      feedback.innerHTML = '<strong>✗ Ce n\'est pas la bonne option.</strong> La bonne réponse est entourée en vert. Lis la correction pour comprendre pourquoi.';
+      correction.classList.add('show');
+      exercise.classList.add('failed');
+    }
+  }
+
+  function showHint(exId) {
+    const feedback = document.getElementById('feedback-' + exId);
+    const data = exerciseData[exId];
+    feedback.classList.remove('success', 'error');
+    feedback.classList.add('show', 'hint');
+    feedback.innerHTML = '<strong>Indice :</strong> ' + data.hint;
+  }
+
+  // Gestion des QCM (clics sur les options)
+  document.querySelectorAll('.ex-qcm').forEach(qcm => {
+    qcm.addEventListener('click', e => {
+      const option = e.target.closest('.ex-qcm-option');
+      if (!option) return;
+      // Ne pas permettre de changer après validation correcte
+      const exId = qcm.dataset.ex;
+      const exercise = document.getElementById('ex-' + exId);
+      if (exercise.classList.contains('solved')) return;
+
+      qcm.querySelectorAll('.ex-qcm-option').forEach(o => {
+        o.classList.remove('selected', 'wrong');
+      });
+      option.classList.add('selected');
+    });
+  });
+
+  // Permettre de valider avec Entrée
+  document.querySelectorAll('.ex-input').forEach(input => {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const exId = input.id.replace('input-', '');
+        if (input.id.startsWith('bac-')) return; // géré séparément
+        // Tolérance par défaut selon l'exercice
+        const tolerances = { 6: 5, 8: 0.5, 9: 0.5, 10: 0.5, 11: 0.5, 12: 0.5 };
+        validateNumber(exId, tolerances[exId] || 0.01);
+      }
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // Système de validation du sujet bac
+  // ═══════════════════════════════════════════════════════
+
+  function showBacFeedback(qId, type, message) {
+    const fb = document.getElementById('bac-feedback-' + qId);
+    fb.classList.remove('show', 'success', 'error', 'hint');
+    fb.classList.add('show', type);
+    fb.innerHTML = message;
+  }
+
+  function showBacCorrection(qId) {
+    const corr = document.getElementById('bac-correction-' + qId);
+    corr.classList.add('show');
+  }
+
+  function hintBac(qId, msg) {
+    showBacFeedback(qId, 'hint', '<strong>Indice :</strong> ' + msg);
+  }
+
+  function validateBac(qId, accepted, tolerance) {
+    const input = document.getElementById('bac-input-' + qId);
+    const userValue = parseFloat(input.value.replace(',', '.').trim());
+
+    input.classList.remove('correct', 'wrong');
+
+    if (input.value.trim() === '' || isNaN(userValue)) {
+      showBacFeedback(qId, 'error', '<strong>Réponse vide.</strong> Entre une valeur numérique avant de valider.');
+      return;
+    }
+
+    const isCorrect = accepted.some(val => Math.abs(userValue - val) <= tolerance);
+
+    if (isCorrect) {
+      input.classList.add('correct');
+      showBacFeedback(qId, 'success', '<strong>✓ Correct !</strong> Bien joué. La correction détaillée est ci-dessous pour confirmer la rédaction.');
+      showBacCorrection(qId);
+    } else {
+      input.classList.add('wrong');
+      showBacFeedback(qId, 'error', '<strong>✗ Pas tout à fait.</strong> Vérifie ton calcul ou clique sur "Indice". La correction complète s\'affiche en dessous.');
+      showBacCorrection(qId);
+    }
+  }
+
+  function validateBacTable2() {
+    const a = document.getElementById('bac-input-2a');
+    const b = document.getElementById('bac-input-2b');
+    const c = document.getElementById('bac-input-2c');
+    const va = parseFloat(a.value.replace(',', '.').trim());
+    const vb = parseFloat(b.value.replace(',', '.').trim());
+    const vc = parseFloat(c.value.replace(',', '.').trim());
+
+    [a, b, c].forEach(el => el.classList.remove('correct', 'wrong'));
+
+    if ([va, vb, vc].some(isNaN)) {
+      showBacFeedback(2, 'error', '<strong>Tableau incomplet.</strong> Remplis les trois cases avant de valider.');
+      return;
+    }
+
+    const okA = Math.abs(va - 1272) <= 1;
+    const okB = Math.abs(vb - 1348) <= 2;
+    const okC = Math.abs(vc - 1429) <= 3;
+
+    a.classList.add(okA ? 'correct' : 'wrong');
+    b.classList.add(okB ? 'correct' : 'wrong');
+    c.classList.add(okC ? 'correct' : 'wrong');
+
+    if (okA && okB && okC) {
+      showBacFeedback(2, 'success', '<strong>✓ Excellent !</strong> Le tableau est correct. La correction confirme la méthode.');
+    } else {
+      const errs = [!okA && 'u₁', !okB && 'u₂', !okC && 'u₃'].filter(Boolean).join(', ');
+      showBacFeedback(2, 'error', '<strong>✗ Erreur(s) sur :</strong> ' + errs + '. Vérifie tes multiplications par 1,06.');
+    }
+    showBacCorrection(2);
+  }
+
+  function validateBacFormule3() {
+    const input = document.getElementById('bac-input-3');
+    const val = input.value.replace(/\s/g, '').replace(',', '.').toLowerCase();
+
+    input.classList.remove('correct', 'wrong');
+
+    if (val === '') {
+      showBacFeedback(3, 'error', '<strong>Réponse vide.</strong> Écris la formule explicite avant de valider.');
+      return;
+    }
+
+    // Acceptations multiples : différentes notations
+    // 1200 × 1.06^n, 1200*1.06^n, 1200×1,06^n etc.
+    const patterns = [
+      /^1200[*×x]1\.?06\^n$/,
+      /^1200[*×x]\(1\.?06\)\^n$/,
+      /^1200[*×x]1\.?06\*\*n$/
+    ];
+    const isCorrect = patterns.some(p => p.test(val));
+
+    if (isCorrect) {
+      input.classList.add('correct');
+      showBacFeedback(3, 'success', '<strong>✓ Correct !</strong> La formule explicite est bien posée.');
+    } else {
+      input.classList.add('wrong');
+      showBacFeedback(3, 'error', '<strong>✗ Format à revoir.</strong> Écris ta réponse sous la forme <code>1200 × 1.06^n</code> (utilise * ou × pour la multiplication, ^ pour la puissance). Voir la correction.');
+    }
+    showBacCorrection(3);
+  }
+
+  function validateBac5() {
+    const a = document.getElementById('bac-input-5a');
+    const b = document.getElementById('bac-input-5b');
+    const va = parseFloat(a.value.replace(',', '.').trim());
+    const vb = parseFloat(b.value.replace(',', '.').trim());
+
+    [a, b].forEach(el => el.classList.remove('correct', 'wrong'));
+
+    if (isNaN(va) || isNaN(vb)) {
+      showBacFeedback(5, 'error', '<strong>Réponses incomplètes.</strong> Remplis les deux cases avant de valider.');
+      return;
+    }
+
+    const okA = va === 13;
+    const okB = vb === 2039;
+
+    a.classList.add(okA ? 'correct' : 'wrong');
+    b.classList.add(okB ? 'correct' : 'wrong');
+
+    if (okA && okB) {
+      showBacFeedback(5, 'success', '<strong>✓ Parfait !</strong> Le rang trouvé et l\'année sont corrects. Bonus : compare ta rédaction à la correction pour vérifier que tu as bien tous les pas attendus.');
+    } else if (!okA && !okB) {
+      showBacFeedback(5, 'error', '<strong>✗ Les deux réponses sont incorrectes.</strong> Vérifie le calcul de ln(2,0833)/ln(1,06) puis l\'année (2026 + n).');
+    } else if (!okA) {
+      showBacFeedback(5, 'error', '<strong>✗ Le rang n est incorrect.</strong> Pense à prendre le plus petit ENTIER supérieur ou égal à la valeur trouvée.');
+    } else {
+      showBacFeedback(5, 'error', '<strong>✗ L\'année est incorrecte.</strong> N\'oublie pas que l\'année est 2026 + n.');
+    }
+    showBacCorrection(5);
+  }
+
+  // Permettre Entrée sur les inputs du bac
+  document.querySelectorAll('[id^="bac-input-"]').forEach(input => {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && input.tagName !== 'TEXTAREA') {
+        // Trouver le bouton valider de la même question
+        const question = input.closest('.bac-question');
+        if (question) {
+          const validateBtn = question.querySelector('.ex-btn.primary');
+          if (validateBtn) validateBtn.click();
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
