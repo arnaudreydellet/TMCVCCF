@@ -1324,6 +1324,43 @@
     font-weight: 600;
   }
 
+  .progress-tracker-saved {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: rgba(250, 247, 242, 0.65);
+  }
+
+  .saved-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #7ec846;
+    box-shadow: 0 0 8px rgba(126, 200, 70, 0.5);
+    flex-shrink: 0;
+  }
+
+  .saved-dot.flash {
+    animation: savedFlash 0.6s ease;
+  }
+
+  @keyframes savedFlash {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.6); box-shadow: 0 0 14px rgba(126, 200, 70, 0.9); }
+    100% { transform: scale(1); }
+  }
+
+  .progress-tracker-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
   .progress-counter {
     font-family: 'Fraunces', serif;
     font-size: 56px;
@@ -1335,6 +1372,79 @@
   .progress-counter sub {
     font-size: 22px;
     color: rgba(250, 247, 242, 0.5);
+  }
+
+  .reset-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: transparent;
+    color: rgba(250, 247, 242, 0.6);
+    border: 1px solid rgba(250, 247, 242, 0.25);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .reset-btn:hover {
+    color: var(--paper);
+    border-color: var(--paper);
+  }
+
+  .tracker-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .regen-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--ink);
+    border: 1px solid var(--gold);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+
+  .regen-btn:hover {
+    background: var(--gold-deep);
+    color: var(--paper);
+    border-color: var(--gold-deep);
+  }
+
+  .regen-btn:active {
+    transform: scale(0.97);
+  }
+
+  .regen-icon {
+    display: inline-block;
+    font-size: 14px;
+    transition: transform 0.4s ease;
+  }
+
+  .regen-btn:hover .regen-icon {
+    transform: rotate(180deg);
+  }
+
+  .regen-btn.spinning .regen-icon {
+    animation: regenSpin 0.6s ease;
+  }
+
+  @keyframes regenSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
   /* Intro de section exercices */
@@ -1692,6 +1802,9 @@
     .ex-input { width: 100%; max-width: 200px; }
     .progress-tracker { grid-template-columns: 1fr; padding: 24px; text-align: center; }
     .progress-counter { font-size: 42px; }
+    .progress-tracker-right { align-items: center; }
+    .progress-tracker-saved { justify-content: center; }
+    .tracker-actions { align-items: center; }
     .ex-intro { padding: 24px; }
     .ex-intro h3 { font-size: 22px; }
     .bac-header { padding: 24px; }
@@ -2427,9 +2540,21 @@
       <div>
         <div class="progress-tracker-label">★ Ta progression</div>
         <div class="progress-tracker-text">Exercices réussis</div>
+        <div class="progress-tracker-saved">
+          <span class="saved-dot"></span>
+          <span id="saved-status">Progression sauvegardée automatiquement</span>
+        </div>
       </div>
-      <div class="progress-counter">
-        <span id="score-count">0</span><sub>/12</sub>
+      <div class="progress-tracker-right">
+        <div class="progress-counter">
+          <span id="score-count">0</span><sub>/12</sub>
+        </div>
+        <div class="tracker-actions">
+          <button class="regen-btn" id="regen-btn" onclick="regenerateExercises()">
+            <span class="regen-icon">↻</span> Nouveaux exercices
+          </button>
+          <button class="reset-btn" id="reset-btn" onclick="resetProgress()">Tout réinitialiser</button>
+        </div>
       </div>
     </div>
 
@@ -3258,6 +3383,593 @@
     }
   };
 
+  // ═══════════════════════════════════════════════════════
+  // Système de sauvegarde — localStorage
+  // ═══════════════════════════════════════════════════════
+  const STORAGE_KEY = 'reydellet_fiche_revision_v1';
+
+  // État sauvegardable
+  const state = {
+    solved: [],          // IDs des exercices réussis (qcm/numeric)
+    answers: {},         // valeurs des inputs (clé = id de l'input)
+    qcmSelections: {},   // sélections QCM (clé = numéro d'exercice, valeur = lettre)
+    revealedCorrections: [], // IDs où la correction a été affichée (juste/faux)
+    failed: [],          // IDs des exercices essayés mais ratés (pour cadre rouge)
+    bacAnswered: []      // IDs des questions bac validées (pour réafficher la correction)
+  };
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      flashSavedDot();
+    } catch (e) {
+      // localStorage indisponible (mode privé Safari rare, espace plein) — silencieux
+      const status = document.getElementById('saved-status');
+      if (status) status.textContent = 'Sauvegarde indisponible (mode privé ?)';
+    }
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const loaded = JSON.parse(raw);
+      Object.assign(state, loaded);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function flashSavedDot() {
+    const dot = document.querySelector('.saved-dot');
+    if (!dot) return;
+    dot.classList.remove('flash');
+    void dot.offsetWidth; // force reflow
+    dot.classList.add('flash');
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Système de génération d'exercices aléatoires
+  // ═══════════════════════════════════════════════════════
+  // Chaque exercice "régénérable" a une fonction qui produit
+  // un nouvel énoncé, une nouvelle correction et une nouvelle
+  // valeur attendue à partir de paramètres tirés au hasard.
+  // Les exercices QCM (1, 5) restent fixes car conceptuels.
+
+  // Helpers
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function fmt(n, decimals = 0) {
+    // Formate un nombre en français (virgule au lieu de point)
+    return n.toFixed(decimals).replace('.', ',');
+  }
+
+  // ──────────────────────────────────────────────────────
+  // Générateurs par exercice
+  // ──────────────────────────────────────────────────────
+
+  // EX 2 : récurrence — calcul de u_{n+1} à partir de u_n
+  function genEx2() {
+    const q = pick([1.1, 1.15, 1.2, 1.25, 1.3, 1.4, 1.5]);
+    const uN = pick([100, 120, 150, 180, 200, 240, 250, 300, 400, 500]);
+    const rang = randInt(2, 5);
+    const result = uN * q;
+    return {
+      statement: `Soit (u<sub>n</sub>) une suite géométrique de <strong>raison q = ${fmt(q, 2).replace(/,?0+$/, '')}</strong>. On sait que u<sub>${rang}</sub> = ${uN}.`,
+      question: `Calcule u<sub>${rang + 1}</sub> en utilisant la <em>relation de récurrence</em>.`,
+      label: `u<sub>${rang + 1}</sub> =`,
+      hint: `La relation de récurrence dit u_{n+1} = u_n × q. Pour passer de u<sub>${rang}</sub> à u<sub>${rang+1}</sub>, multiplie par la raison.`,
+      acceptable: [Math.round(result * 100) / 100],
+      tolerance: 0.5,
+      correction: [
+        `On utilise la relation de récurrence : <span class="ex-correction-math">u<sub>n+1</sub> = u<sub>n</sub> × q</span>`,
+        `Pour passer de u<sub>${rang}</sub> à u<sub>${rang+1}</sub>, on multiplie par la raison : <span class="ex-correction-math">u<sub>${rang+1}</sub> = u<sub>${rang}</sub> × q = ${uN} × ${fmt(q,2).replace(/,?0+$/,'')}</span>`,
+        `On effectue le calcul : <span class="ex-correction-math">${uN} × ${fmt(q,2).replace(/,?0+$/,'')} = ${fmt(result, 2).replace(/,?0+$/, '')}</span>`,
+      ],
+      final: `✓ Réponse : u<sub>${rang+1}</sub> = ${fmt(result, 2).replace(/,?0+$/, '')}`
+    };
+  }
+
+  // EX 3 : pourcentage → raison
+  function genEx3() {
+    const t = pick([2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20]);
+    const sens = pick(['augmente', 'diminue']);
+    const q = sens === 'augmente' ? 1 + t/100 : 1 - t/100;
+    const contexte = sens === 'augmente'
+      ? pick([
+          `Le nombre d'utilisateurs d'une appli`,
+          `La population d'une ville`,
+          `Le chiffre d'affaires d'une entreprise`,
+          `La production d'une usine`
+        ])
+      : pick([
+          `La population d'une espèce menacée`,
+          `Les ventes d'un produit en déclin`,
+          `La concentration d'un polluant`,
+          `Le nombre d'abonnés d'un magazine papier`
+        ]);
+    return {
+      statement: `${contexte} <strong>${sens} de ${t} % chaque année</strong>. On modélise cette évolution par une suite géométrique.`,
+      question: `Quelle est la valeur de la raison q ?`,
+      label: `q =`,
+      hint: `${sens === 'augmente' ? 'Augmentation' : 'Diminution'} de t % par période → q = 1 ${sens === 'augmente' ? '+' : '−'} t/100. Ici t = ${t}.`,
+      acceptable: [Math.round(q * 1000) / 1000],
+      tolerance: 0.001,
+      correction: [
+        `${sens === 'augmente' ? 'Augmentation' : 'Diminution'} de t % par période → <span class="ex-correction-math">q = 1 ${sens === 'augmente' ? '+' : '−'} t/100</span>`,
+        `Ici t = ${t}, donc <span class="ex-correction-math">q = 1 ${sens === 'augmente' ? '+' : '−'} ${t}/100 = 1 ${sens === 'augmente' ? '+' : '−'} ${fmt(t/100, 2)}</span>`,
+        `On obtient <span class="ex-correction-math">q = ${fmt(q, 3).replace(/,?0+$/, '')}</span> (et bien q ${sens === 'augmente' ? '> 1' : '< 1'}, ce qui confirme une ${sens === 'augmente' ? 'augmentation' : 'diminution'}).`,
+      ],
+      final: `✓ Réponse : q = ${fmt(q, 3).replace(/,?0+$/, '')}`
+    };
+  }
+
+  // EX 4 : formule explicite — calcul direct
+  function genEx4() {
+    // On choisit des cas où le résultat est "joli"
+    const cas = pick([
+      { u0: 5, q: 2, n: 6 },     // 320
+      { u0: 3, q: 2, n: 8 },     // 768
+      { u0: 8, q: 2, n: 8 },     // 2048
+      { u0: 10, q: 2, n: 7 },    // 1280
+      { u0: 4, q: 3, n: 5 },     // 972
+      { u0: 7, q: 2, n: 9 },     // 3584
+      { u0: 6, q: 2, n: 10 },    // 6144
+    ]);
+    const result = cas.u0 * Math.pow(cas.q, cas.n);
+    return {
+      statement: `Une suite géométrique a pour premier terme <strong>u<sub>0</sub> = ${cas.u0}</strong> et pour <strong>raison q = ${cas.q}</strong>.`,
+      question: `Calcule u<sub>${cas.n}</sub> en utilisant la formule explicite.`,
+      label: `u<sub>${cas.n}</sub> =`,
+      hint: `Formule explicite : u_n = u_0 × q^n. Calcule ${cas.q}^${cas.n} puis multiplie par u_0.`,
+      acceptable: [result],
+      tolerance: 0.5,
+      correction: [
+        `Formule explicite : <span class="ex-correction-math">u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup></span>`,
+        `Avec n = ${cas.n}, u<sub>0</sub> = ${cas.u0} et q = ${cas.q} : <span class="ex-correction-math">u<sub>${cas.n}</sub> = ${cas.u0} × ${cas.q}<sup>${cas.n}</sup></span>`,
+        `${cas.q}<sup>${cas.n}</sup> = ${Math.pow(cas.q, cas.n)}, donc <span class="ex-correction-math">u<sub>${cas.n}</sub> = ${cas.u0} × ${Math.pow(cas.q, cas.n)} = ${result}</span>`,
+      ],
+      final: `✓ Réponse : u<sub>${cas.n}</sub> = ${result}`
+    };
+  }
+
+  // EX 6 : suite décroissante (dépréciation)
+  function genEx6() {
+    const objet = pick([
+      { nom: 'Une voiture neuve', valeur: 'sa valeur', mot: 'voiture' },
+      { nom: 'Un ordinateur portable', valeur: 'sa valeur', mot: 'ordinateur' },
+      { nom: 'Un scooter', valeur: 'sa valeur', mot: 'scooter' },
+      { nom: 'Une moto', valeur: 'sa valeur', mot: 'moto' },
+    ]);
+    const u0 = pick([15000, 18000, 20000, 22000, 25000, 30000]);
+    const t = pick([8, 10, 12, 15, 18, 20]);
+    const n = randInt(8, 14);
+    const q = 1 - t/100;
+    const result = Math.round(u0 * Math.pow(q, n));
+    return {
+      statement: `${objet.nom} coûte <strong>${u0.toLocaleString('fr-FR')} €</strong>. ${objet.valeur.charAt(0).toUpperCase() + objet.valeur.slice(1)} diminue de <strong>${t} % chaque année</strong>.`,
+      question: `Quelle sera sa valeur au bout de ${n} ans ? (réponse arrondie à l'euro)`,
+      label: `Valeur ≈`,
+      unit: `€`,
+      hint: `u_0 = ${u0}, q = ${fmt(q, 2)} (diminution de ${t} %). Calcule ${u0} × ${fmt(q, 2)}^${n} à la calculatrice.`,
+      acceptable: [result, result - 1, result + 1],
+      tolerance: 5,
+      correction: [
+        `On modélise par une suite géométrique de premier terme u<sub>0</sub> = ${u0} et de raison q = 1 − ${t}/100 = <strong>${fmt(q, 2)}</strong>.`,
+        `Au bout de ${n} ans, on cherche u<sub>${n}</sub>. Formule explicite : <span class="ex-correction-math">u<sub>${n}</sub> = ${u0} × ${fmt(q, 2)}<sup>${n}</sup></span>`,
+        `À la calculatrice : ${fmt(q, 2)}<sup>${n}</sup> ≈ ${fmt(Math.pow(q, n), 4)}, donc <span class="ex-correction-math">u<sub>${n}</sub> ≈ ${result}</span>`,
+      ],
+      final: `✓ Réponse : environ ${result.toLocaleString('fr-FR')} € — l'objet a perdu une grande part de sa valeur en ${n} ans.`
+    };
+  }
+
+  // EX 7 : Propriétés de ln (puissance de 2)
+  function genEx7() {
+    const cas = pick([
+      { val: 4, n: 2, ln2: 0.693 },
+      { val: 8, n: 3, ln2: 0.693 },
+      { val: 16, n: 4, ln2: 0.693 },
+      { val: 32, n: 5, ln2: 0.693 },
+      { val: 64, n: 6, ln2: 0.693 },
+    ]);
+    return {
+      statement: `On donne ln(2) ≈ ${cas.ln2}.`,
+      question: `En utilisant la propriété <em>ln(a<sup>n</sup>) = n × ln(a)</em>, calcule ln(${cas.val}) sans calculatrice. Indique la valeur de <strong>n</strong> dans la décomposition ${cas.val} = 2<sup>n</sup>.`,
+      label: `n =`,
+      hint: `Cherche la puissance de 2 qui donne ${cas.val}. Combien de fois faut-il multiplier 2 par lui-même ?`,
+      acceptable: [cas.n],
+      tolerance: 0.01,
+      correction: [
+        `On cherche à écrire ${cas.val} sous la forme 2<sup>n</sup>.`,
+        `2<sup>1</sup> = 2, 2<sup>2</sup> = 4, … jusqu'à <span class="ex-correction-math">${cas.val} = 2<sup>${cas.n}</sup></span>, donc n = ${cas.n}.`,
+        `Bonus — on peut alors calculer ln(${cas.val}) : <span class="ex-correction-math">ln(${cas.val}) = ln(2<sup>${cas.n}</sup>) = ${cas.n} × ln(2) ≈ ${cas.n} × ${cas.ln2} ≈ ${fmt(cas.n * cas.ln2, 3)}</span>`,
+      ],
+      final: `✓ Réponse : n = ${cas.n} (et donc ln(${cas.val}) ≈ ${fmt(cas.n * cas.ln2, 3)}).`
+    };
+  }
+
+  // EX 8 : inéquation type seuil (q > 1)
+  function genEx8() {
+    const u0 = pick([500, 800, 1000, 1200, 1500, 2000]);
+    const t = pick([3, 4, 5, 6, 8, 10]);
+    const q = 1 + t/100;
+    const facteur = pick([2, 2.5, 3, 4]);
+    const seuil = u0 * facteur;
+    const exact = Math.log(seuil/u0) / Math.log(q);
+    const result = Math.ceil(exact);
+    return {
+      statement: `Soit (u<sub>n</sub>) une suite géométrique de premier terme <strong>u<sub>0</sub> = ${u0}</strong> et de raison <strong>q = ${fmt(q, 2)}</strong>.`,
+      question: `À partir de quel rang n a-t-on u<sub>n</sub> ≥ ${seuil} ? (donne le plus petit entier n)`,
+      label: `n =`,
+      hint: `Pose ${u0} × ${fmt(q, 2)}^n ≥ ${seuil}, simplifie, puis applique ln. Vérifie le signe de ln(${fmt(q, 2)}).`,
+      acceptable: [result],
+      tolerance: 0.5,
+      correction: [
+        `On utilise la formule explicite et on pose l'inéquation : <span class="ex-correction-math">${u0} × ${fmt(q, 2)}<sup>n</sup> ≥ ${seuil}</span>`,
+        `On divise par ${u0} : <span class="ex-correction-math">${fmt(q, 2)}<sup>n</sup> ≥ ${fmt(seuil/u0, 2)}</span>`,
+        `On applique ln des deux côtés : <span class="ex-correction-math">n × ln(${fmt(q, 2)}) ≥ ln(${fmt(seuil/u0, 2)})</span>`,
+        `ln(${fmt(q, 2)}) ≈ ${fmt(Math.log(q), 4)} est <strong>positif</strong>, on divise sans changer le sens : <span class="ex-correction-math">n ≥ ln(${fmt(seuil/u0, 2)}) / ln(${fmt(q, 2)}) ≈ ${fmt(exact, 2)}</span>`,
+        `Comme n doit être un entier, on prend l'entier juste au-dessus.`,
+      ],
+      final: `✓ Réponse : n = ${result} (à partir du rang ${result}, u<sub>n</sub> dépasse ${seuil}).`
+    };
+  }
+
+  // EX 9 : inéquation type seuil (q < 1) — piège du sens
+  function genEx9() {
+    const u0 = pick([500, 600, 800, 1000, 1200]);
+    const t = pick([5, 8, 10, 12, 15, 20]);
+    const q = 1 - t/100;
+    const facteur = pick([0.2, 0.25, 0.3, 0.4]);
+    const seuil = Math.round(u0 * facteur);
+    const exact = Math.log(seuil/u0) / Math.log(q);
+    const result = Math.ceil(exact);
+    return {
+      statement: `Soit (u<sub>n</sub>) une suite géométrique de premier terme <strong>u<sub>0</sub> = ${u0}</strong> et de raison <strong>q = ${fmt(q, 2)}</strong>.`,
+      question: `À partir de quel rang n a-t-on u<sub>n</sub> ≤ ${seuil} ? <strong>Attention au sens de l'inégalité quand tu divises par ln(q) !</strong>`,
+      label: `n =`,
+      hint: `Pose ${u0} × ${fmt(q, 2)}^n ≤ ${seuil}. Quand tu appliques ln, ln(${fmt(q, 2)}) est négatif → inverse le sens de l'inégalité en divisant !`,
+      acceptable: [result],
+      tolerance: 0.5,
+      correction: [
+        `On pose l'inéquation : <span class="ex-correction-math">${u0} × ${fmt(q, 2)}<sup>n</sup> ≤ ${seuil}</span>`,
+        `On divise par ${u0} : <span class="ex-correction-math">${fmt(q, 2)}<sup>n</sup> ≤ ${fmt(seuil/u0, 3)}</span>`,
+        `On applique ln : <span class="ex-correction-math">n × ln(${fmt(q, 2)}) ≤ ln(${fmt(seuil/u0, 3)})</span>`,
+        `<strong>Attention !</strong> ln(${fmt(q, 2)}) ≈ ${fmt(Math.log(q), 4)} est <strong>négatif</strong>. Quand on divise par un nombre négatif, on inverse le sens : <span class="ex-correction-math">n ≥ ln(${fmt(seuil/u0, 3)}) / ln(${fmt(q, 2)}) ≈ ${fmt(exact, 2)}</span>`,
+      ],
+      final: `✓ Réponse : n = ${result} — c'est le piège classique du CCF, sans inversion du sens tu te trompais.`
+    };
+  }
+
+  // EX 10 : capital placé
+  function genEx10() {
+    const prenom = pick(['Léa', 'Lucas', 'Amélie', 'Tom', 'Sarah', 'Hugo', 'Inès', 'Nathan']);
+    const u0 = pick([1500, 2000, 2500, 3000, 3500, 5000]);
+    const t = pick([2, 2.5, 3, 3.5, 4]);
+    const q = 1 + t/100;
+    const objectif = u0 * pick([1.4, 1.5, 1.6, 1.8, 2]);
+    const seuil = Math.round(objectif / 100) * 100;
+    const exact = Math.log(seuil/u0) / Math.log(q);
+    const result = Math.ceil(exact);
+    return {
+      statement: `${prenom} place <strong>${u0.toLocaleString('fr-FR')} €</strong> sur un livret rémunéré à <strong>${fmt(t, 1).replace(/,?0+$/, '')} % par an</strong>, intérêts composés. ${prenom === 'Léa' || prenom === 'Amélie' || prenom === 'Sarah' || prenom === 'Inès' ? 'Elle' : 'Il'} voudrait savoir au bout de combien d'années son capital aura dépassé <strong>${seuil.toLocaleString('fr-FR')} €</strong>.`,
+      question: `Détermine le plus petit entier n tel que le capital à l'année n dépasse ${seuil.toLocaleString('fr-FR')} €.`,
+      label: `n =`,
+      unit: `années`,
+      hint: `u_0 = ${u0}, q = ${fmt(q, 3).replace(/,?0+$/,'')}. Pose ${u0} × ${fmt(q, 3).replace(/,?0+$/,'')}^n ≥ ${seuil} et applique ln.`,
+      acceptable: [result, result - 1],
+      tolerance: 0.5,
+      correction: [
+        `<strong>Modélisation :</strong> suite géométrique avec u<sub>0</sub> = ${u0} et q = 1 + ${fmt(t, 1).replace(/,?0+$/, '')}/100 = ${fmt(q, 3).replace(/,?0+$/, '')}.`,
+        `<strong>Inéquation :</strong> <span class="ex-correction-math">${u0} × ${fmt(q, 3).replace(/,?0+$/,'')}<sup>n</sup> ≥ ${seuil}</span>`,
+        `On divise par ${u0} : <span class="ex-correction-math">${fmt(q, 3).replace(/,?0+$/,'')}<sup>n</sup> ≥ ${fmt(seuil/u0, 3)}</span>`,
+        `On applique ln : <span class="ex-correction-math">n × ln(${fmt(q, 3).replace(/,?0+$/,'')}) ≥ ln(${fmt(seuil/u0, 3)})</span>`,
+        `ln(${fmt(q, 3).replace(/,?0+$/,'')}) ≈ ${fmt(Math.log(q), 4)} > 0, on divise sans inverser : <span class="ex-correction-math">n ≥ ${fmt(exact, 2)}</span>`,
+      ],
+      final: `✓ Au bout de ${result} ans, le capital de ${prenom} dépassera ${seuil.toLocaleString('fr-FR')} €.`
+    };
+  }
+
+  // EX 11 : dépollution
+  function genEx11() {
+    const u0 = pick([300, 400, 500, 600, 800]);
+    const t = pick([5, 7, 8, 10, 12, 15]);
+    const q = 1 - t/100;
+    const seuilFacteur = pick([0.1, 0.15, 0.2, 0.25]);
+    const seuil = Math.round(u0 * seuilFacteur / 10) * 10;
+    const exact = Math.log(seuil/u0) / Math.log(q);
+    const result = Math.ceil(exact);
+    return {
+      statement: `Un lac contient <strong>${u0} mg/L de polluants</strong>. Grâce à un dispositif de filtration, la concentration <strong>diminue de ${t} % chaque mois</strong>. Les normes environnementales exigent une concentration ≤ ${seuil} mg/L pour rouvrir la baignade.`,
+      question: `Au bout de combien de mois pourra-t-on rouvrir la baignade ?`,
+      label: `n =`,
+      unit: `mois`,
+      hint: `Diminution de ${t} % → q = ${fmt(q, 2)}. ln(${fmt(q, 2)}) est négatif, n'oublie pas d'inverser le sens en divisant.`,
+      acceptable: [result],
+      tolerance: 0.5,
+      correction: [
+        `<strong>Modélisation :</strong> suite géométrique avec u<sub>0</sub> = ${u0} et q = 1 − ${t}/100 = ${fmt(q, 2)}.`,
+        `<strong>Inéquation :</strong> on cherche u<sub>n</sub> ≤ ${seuil}, soit <span class="ex-correction-math">${u0} × ${fmt(q, 2)}<sup>n</sup> ≤ ${seuil}</span>`,
+        `On divise par ${u0} : <span class="ex-correction-math">${fmt(q, 2)}<sup>n</sup> ≤ ${fmt(seuil/u0, 3)}</span>`,
+        `On applique ln : <span class="ex-correction-math">n × ln(${fmt(q, 2)}) ≤ ln(${fmt(seuil/u0, 3)})</span>`,
+        `<strong>⚠ Piège :</strong> ln(${fmt(q, 2)}) ≈ ${fmt(Math.log(q), 4)} est négatif. On inverse le sens en divisant : <span class="ex-correction-math">n ≥ ${fmt(exact, 2)}</span>`,
+      ],
+      final: `✓ Il faudra attendre ${result} mois pour rouvrir la baignade.`
+    };
+  }
+
+  // EX 12 : médicament
+  function genEx12() {
+    const u0 = pick([100, 150, 200, 250, 300]);
+    const t = pick([15, 20, 25, 30, 40]);
+    const q = 1 - t/100;
+    const seuilFacteur = pick([0.05, 0.075, 0.1, 0.15]);
+    const seuil = Math.round(u0 * seuilFacteur);
+    const exact = Math.log(seuil/u0) / Math.log(q);
+    const result = Math.ceil(exact);
+    return {
+      statement: `Un patient reçoit une dose unique de <strong>${u0} mg</strong> d'un médicament. Chaque heure, l'organisme élimine <strong>${t} % de la quantité présente dans le sang</strong>. Le médicament n'est plus efficace en dessous de <strong>${seuil} mg</strong>.`,
+      question: `Au bout de combien d'heures le médicament cesse-t-il d'être efficace ?`,
+      label: `n =`,
+      unit: `heures`,
+      hint: `On élimine ${t} %, donc il reste ${100-t} %. q = ${fmt(q, 2)}. Pose ${u0} × ${fmt(q, 2)}^n ≤ ${seuil}.`,
+      acceptable: [result],
+      tolerance: 0.5,
+      correction: [
+        `<strong>Modélisation :</strong> on perd ${t} % chaque heure, donc on conserve ${100-t} %. La raison est q = 1 − ${t}/100 = ${fmt(q, 2)}. Premier terme u<sub>0</sub> = ${u0}.`,
+        `<strong>Inéquation :</strong> on cherche u<sub>n</sub> ≤ ${seuil}, soit <span class="ex-correction-math">${u0} × ${fmt(q, 2)}<sup>n</sup> ≤ ${seuil}</span>`,
+        `On divise par ${u0} : <span class="ex-correction-math">${fmt(q, 2)}<sup>n</sup> ≤ ${fmt(seuil/u0, 3)}</span>`,
+        `On applique ln : <span class="ex-correction-math">n × ln(${fmt(q, 2)}) ≤ ln(${fmt(seuil/u0, 3)})</span>`,
+        `ln(${fmt(q, 2)}) ≈ ${fmt(Math.log(q), 4)} est négatif → inversion du sens : <span class="ex-correction-math">n ≥ ${fmt(exact, 2)}</span>`,
+      ],
+      final: `✓ Au bout de ${result} heures, le médicament n'est plus efficace.`
+    };
+  }
+
+  // ──────────────────────────────────────────────────────
+  // Fonction qui applique un exercice généré au DOM
+  // ──────────────────────────────────────────────────────
+  function applyGeneratedExercise(exId, gen) {
+    const ex = document.getElementById('ex-' + exId);
+    if (!ex) return;
+
+    // Mise à jour de l'énoncé et de la question
+    const statement = ex.querySelector('.ex-statement');
+    const question = ex.querySelector('.ex-question');
+    if (statement) statement.innerHTML = gen.statement;
+    if (question) question.innerHTML = gen.question;
+
+    // Mise à jour de l'input (label et unité)
+    const inputRow = ex.querySelector('.ex-input-row');
+    if (inputRow) {
+      const label = inputRow.querySelector('.ex-input-label');
+      const input = inputRow.querySelector('.ex-input');
+      const unitSpan = inputRow.querySelector('.ex-input-unit');
+      if (label) label.innerHTML = gen.label;
+      if (input) {
+        input.value = '';
+        input.classList.remove('correct', 'wrong');
+      }
+      if (unitSpan) {
+        unitSpan.textContent = gen.unit || '';
+        unitSpan.style.display = gen.unit ? '' : 'none';
+      } else if (gen.unit) {
+        // Créer un span d'unité s'il n'existe pas
+        const newUnit = document.createElement('span');
+        newUnit.className = 'ex-input-unit';
+        newUnit.textContent = gen.unit;
+        inputRow.appendChild(newUnit);
+      }
+    }
+
+    // Mise à jour des données pour validation et indice
+    exerciseData[exId] = {
+      hint: gen.hint,
+      acceptable: gen.acceptable
+    };
+    // Stocker la tolérance pour validation
+    ex.dataset.tolerance = gen.tolerance || 0.01;
+
+    // Mise à jour de la correction
+    const correction = ex.querySelector('.ex-correction');
+    if (correction) {
+      // Vider les anciens steps
+      const oldSteps = correction.querySelectorAll('.ex-correction-step, .ex-correction-final');
+      oldSteps.forEach(el => el.remove());
+      // Ajouter les nouveaux
+      gen.correction.forEach(stepHtml => {
+        const div = document.createElement('div');
+        div.className = 'ex-correction-step';
+        div.innerHTML = stepHtml;
+        correction.appendChild(div);
+      });
+      const finalDiv = document.createElement('div');
+      finalDiv.className = 'ex-correction-final';
+      finalDiv.innerHTML = gen.final;
+      correction.appendChild(finalDiv);
+      // Cacher la correction
+      correction.classList.remove('show');
+    }
+
+    // Reset du feedback
+    const feedback = ex.querySelector('.ex-feedback');
+    if (feedback) {
+      feedback.classList.remove('show', 'success', 'error', 'hint');
+      feedback.innerHTML = '';
+    }
+
+    // Reset du statut visuel de l'exercice
+    ex.classList.remove('solved', 'failed');
+  }
+
+  // ──────────────────────────────────────────────────────
+  // Régénération globale au clic
+  // ──────────────────────────────────────────────────────
+  function regenerateExercises() {
+    const btn = document.getElementById('regen-btn');
+    btn.classList.add('spinning');
+    setTimeout(() => btn.classList.remove('spinning'), 600);
+
+    // Confirmation si l'élève a déjà bossé
+    if (state.solved.length > 0) {
+      if (!confirm('Générer de nouveaux exercices ? Tes réponses actuelles sur les exercices de calcul seront effacées (ta progression bac est conservée).')) {
+        btn.classList.remove('spinning');
+        return;
+      }
+    }
+
+    // Régénérer les exercices de calcul
+    const generators = {
+      2: genEx2, 3: genEx3, 4: genEx4, 6: genEx6,
+      7: genEx7, 8: genEx8, 9: genEx9,
+      10: genEx10, 11: genEx11, 12: genEx12
+    };
+
+    Object.keys(generators).forEach(exId => {
+      const gen = generators[exId]();
+      applyGeneratedExercise(parseInt(exId), gen);
+    });
+
+    // Effacer les exercices régénérés de l'état (ils redeviennent à faire)
+    const regenIds = Object.keys(generators).map(Number);
+    state.solved = state.solved.filter(id => !regenIds.includes(id));
+    state.failed = state.failed.filter(id => !regenIds.includes(id));
+    state.revealedCorrections = state.revealedCorrections.filter(id => {
+      if (typeof id === 'string') return true; // garder les bac-X
+      return !regenIds.includes(id);
+    });
+    // Effacer les réponses sauvegardées de ces exercices
+    regenIds.forEach(id => {
+      delete state.answers['input-' + id];
+    });
+    saveState();
+    updateScore();
+
+    // Scroll doux vers le premier exercice régénéré
+    const firstEx = document.getElementById('ex-2');
+    if (firstEx) {
+      firstEx.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+
+  // Restaure l'état au chargement
+  function restoreUI() {
+    const restored = loadState();
+    if (!restored) return;
+
+    // Score
+    solvedExercises.clear();
+    state.solved.forEach(id => solvedExercises.add(parseInt(id)));
+    updateScore();
+
+    // Restaurer les valeurs des inputs (texte/nombre)
+    Object.keys(state.answers).forEach(inputId => {
+      const input = document.getElementById(inputId);
+      if (input) input.value = state.answers[inputId];
+    });
+
+    // Restaurer les sélections QCM
+    Object.keys(state.qcmSelections).forEach(exId => {
+      const container = document.querySelector(`[data-ex="${exId}"]`);
+      if (!container) return;
+      const value = state.qcmSelections[exId];
+      const option = container.querySelector(`[data-value="${value}"]`);
+      if (option) option.classList.add('selected');
+    });
+
+    // Réappliquer le statut visuel des exercices réussis (1-12)
+    state.solved.forEach(exId => {
+      const ex = document.getElementById('ex-' + exId);
+      if (ex) ex.classList.add('solved');
+      // Marquer l'input en vert
+      const input = document.getElementById('input-' + exId);
+      if (input && input.value) input.classList.add('correct');
+      // Marquer le QCM en vert
+      const qcm = document.querySelector(`[data-ex="${exId}"]`);
+      if (qcm) {
+        const selected = qcm.querySelector('.ex-qcm-option.selected');
+        if (selected) selected.classList.add('correct');
+      }
+    });
+
+    // Réappliquer le statut "raté" sans révéler
+    state.failed.forEach(exId => {
+      if (state.solved.includes(exId)) return; // priorité au succès
+      const ex = document.getElementById('ex-' + exId);
+      if (ex) ex.classList.add('failed');
+      const input = document.getElementById('input-' + exId);
+      if (input && input.value) input.classList.add('wrong');
+    });
+
+    // Réafficher les corrections révélées (exercices 1-12 avec ID numérique)
+    state.revealedCorrections.forEach(id => {
+      if (typeof id === 'string' && id.startsWith('bac-')) {
+        // Question bac
+        const qId = id.replace('bac-', '');
+        const bacCorr = document.getElementById('bac-correction-' + qId);
+        if (bacCorr) bacCorr.classList.add('show');
+      } else {
+        // Exercice numéroté 1-12
+        const corr = document.getElementById('correction-' + id);
+        if (corr) corr.classList.add('show');
+      }
+    });
+
+    // Statut des inputs bac : si la valeur est sauvegardée et la correction révélée,
+    // on ne sait pas si c'est juste/faux. On laisse le bouton Valider redonner l'état.
+    // Mais on met une teinte neutre pour signaler "déjà essayé".
+    state.bacAnswered.forEach(bacKey => {
+      const qId = bacKey.replace('bac-', '');
+      const input = document.getElementById('bac-input-' + qId);
+      if (input && input.value) input.classList.add('correct');
+      // Cas tableau Q2
+      ['a', 'b', 'c'].forEach(suffix => {
+        const tableInput = document.getElementById('bac-input-' + qId + suffix);
+        if (tableInput && tableInput.value) tableInput.classList.add('correct');
+      });
+    });
+  }
+
+  // Hooks pour sauvegarder au fur et à mesure
+  function persistInputChange(input) {
+    state.answers[input.id] = input.value;
+    saveState();
+  }
+
+  function persistQCMSelection(exId, value) {
+    state.qcmSelections[exId] = value;
+    saveState();
+  }
+
+  function markSolved(exId) {
+    if (!state.solved.includes(exId)) {
+      state.solved.push(exId);
+    }
+    state.failed = state.failed.filter(id => id !== exId);
+    if (!state.revealedCorrections.includes(exId)) {
+      state.revealedCorrections.push(exId);
+    }
+    saveState();
+  }
+
+  function markFailed(exId) {
+    if (!state.failed.includes(exId) && !state.solved.includes(exId)) {
+      state.failed.push(exId);
+    }
+    if (!state.revealedCorrections.includes(exId)) {
+      state.revealedCorrections.push(exId);
+    }
+    saveState();
+  }
+
   function updateScore() {
     document.getElementById('score-count').textContent = solvedExercises.size;
   }
@@ -3274,6 +3986,12 @@
     const exercise = document.getElementById('ex-' + exId);
     const userValue = parseAnswer(input.value);
     const data = exerciseData[exId];
+
+    // Si l'exercice a été régénéré, utiliser la tolérance dynamique
+    const dynamicTolerance = exercise.dataset.tolerance;
+    if (dynamicTolerance !== undefined) {
+      tolerance = parseFloat(dynamicTolerance);
+    }
 
     // Reset des classes
     input.classList.remove('correct', 'wrong');
@@ -3299,12 +4017,14 @@
         solvedExercises.add(exId);
         updateScore();
       }
+      markSolved(exId);
     } else {
       input.classList.add('wrong');
       feedback.classList.add('show', 'error');
       feedback.innerHTML = '<strong>✗ Pas tout à fait.</strong> Vérifie ton calcul, ou clique sur "Indice" pour un coup de pouce. La correction est en bas si tu veux la voir.';
       correction.classList.add('show');
       exercise.classList.add('failed');
+      markFailed(exId);
     }
   }
 
@@ -3343,6 +4063,7 @@
         solvedExercises.add(exId);
         updateScore();
       }
+      markSolved(exId);
     } else {
       selected.classList.add('wrong');
       // Marquer la bonne réponse
@@ -3352,6 +4073,7 @@
       feedback.innerHTML = '<strong>✗ Ce n\'est pas la bonne option.</strong> La bonne réponse est entourée en vert. Lis la correction pour comprendre pourquoi.';
       correction.classList.add('show');
       exercise.classList.add('failed');
+      markFailed(exId);
     }
   }
 
@@ -3377,7 +4099,13 @@
         o.classList.remove('selected', 'wrong');
       });
       option.classList.add('selected');
+      persistQCMSelection(exId, option.dataset.value);
     });
+  });
+
+  // Sauvegarder les frappes au clavier dans tous les inputs et textarea
+  document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+    input.addEventListener('input', () => persistInputChange(input));
   });
 
   // Permettre de valider avec Entrée
@@ -3407,6 +4135,11 @@
   function showBacCorrection(qId) {
     const corr = document.getElementById('bac-correction-' + qId);
     corr.classList.add('show');
+    const bacKey = 'bac-' + qId;
+    if (!state.revealedCorrections.includes(bacKey)) {
+      state.revealedCorrections.push(bacKey);
+      saveState();
+    }
   }
 
   function hintBac(qId, msg) {
@@ -3425,15 +4158,21 @@
     }
 
     const isCorrect = accepted.some(val => Math.abs(userValue - val) <= tolerance);
+    const bacKey = 'bac-' + qId;
 
     if (isCorrect) {
       input.classList.add('correct');
       showBacFeedback(qId, 'success', '<strong>✓ Correct !</strong> Bien joué. La correction détaillée est ci-dessous pour confirmer la rédaction.');
       showBacCorrection(qId);
+      if (!state.bacAnswered.includes(bacKey)) state.bacAnswered.push(bacKey);
+      if (!state.revealedCorrections.includes(bacKey)) state.revealedCorrections.push(bacKey);
+      saveState();
     } else {
       input.classList.add('wrong');
       showBacFeedback(qId, 'error', '<strong>✗ Pas tout à fait.</strong> Vérifie ton calcul ou clique sur "Indice". La correction complète s\'affiche en dessous.');
       showBacCorrection(qId);
+      if (!state.revealedCorrections.includes(bacKey)) state.revealedCorrections.push(bacKey);
+      saveState();
     }
   }
 
@@ -3467,6 +4206,8 @@
       showBacFeedback(2, 'error', '<strong>✗ Erreur(s) sur :</strong> ' + errs + '. Vérifie tes multiplications par 1,06.');
     }
     showBacCorrection(2);
+    if (!state.revealedCorrections.includes('bac-2')) state.revealedCorrections.push('bac-2');
+    saveState();
   }
 
   function validateBacFormule3() {
@@ -3481,7 +4222,6 @@
     }
 
     // Acceptations multiples : différentes notations
-    // 1200 × 1.06^n, 1200*1.06^n, 1200×1,06^n etc.
     const patterns = [
       /^1200[*×x]1\.?06\^n$/,
       /^1200[*×x]\(1\.?06\)\^n$/,
@@ -3494,9 +4234,11 @@
       showBacFeedback(3, 'success', '<strong>✓ Correct !</strong> La formule explicite est bien posée.');
     } else {
       input.classList.add('wrong');
-      showBacFeedback(3, 'error', '<strong>✗ Format à revoir.</strong> Écris ta réponse sous la forme <code>1200 × 1.06^n</code> (utilise * ou × pour la multiplication, ^ pour la puissance). Voir la correction.');
+      showBacFeedback(3, 'error', '<strong>✗ Format à revoir.</strong> Écris ta réponse en utilisant <code>*</code> ou <code>×</code> pour la multiplication et <code>^</code> pour la puissance. Voir la correction.');
     }
     showBacCorrection(3);
+    if (!state.revealedCorrections.includes('bac-3')) state.revealedCorrections.push('bac-3');
+    saveState();
   }
 
   function validateBac5() {
@@ -3528,6 +4270,8 @@
       showBacFeedback(5, 'error', '<strong>✗ L\'année est incorrecte.</strong> N\'oublie pas que l\'année est 2026 + n.');
     }
     showBacCorrection(5);
+    if (!state.revealedCorrections.includes('bac-5')) state.revealedCorrections.push('bac-5');
+    saveState();
   }
 
   // Permettre Entrée sur les inputs du bac
@@ -3543,6 +4287,12 @@
       }
     });
   });
+
+  // ═══════════════════════════════════════════════════════
+  // Restauration de la progression sauvegardée
+  // ═══════════════════════════════════════════════════════
+  // S'exécute en dernier, une fois que tous les écouteurs sont en place
+  restoreUI();
 </script>
 
 </body>
